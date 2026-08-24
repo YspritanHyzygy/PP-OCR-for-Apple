@@ -1,0 +1,15 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  metadata:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate project metadata
+        run: python3 scripts/check_project.py
+      - name: Compile Python sources
+        run: python3 -m py_compile scripts/*.py

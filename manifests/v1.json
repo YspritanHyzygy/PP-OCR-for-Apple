@@ -1,0 +1,124 @@
+{
+  "schemaVersion": 1,
+  "packVersion": "1",
+  "releaseTag": "v1",
+  "upstream": {
+    "project": "PaddleOCR",
+    "modelFamily": "PP-OCRv6",
+    "license": "Apache-2.0"
+  },
+  "conversion": {
+    "minimumDeploymentTarget": "iOS 17",
+    "computePrecision": "FLOAT16",
+    "inputOutputType": "FLOAT32",
+    "archiveFormat": "AppleArchive",
+    "compression": "lzfse"
+  },
+  "detector": {
+    "inputWidth": 960,
+    "inputHeight": 960,
+    "mean": [
+      0.485,
+      0.456,
+      0.406
+    ],
+    "std": [
+      0.229,
+      0.224,
+      0.225
+    ],
+    "conversionTolerance": 0.011
+  },
+  "recognizer": {
+    "inputWidth": 640,
+    "inputHeight": 48,
+    "mean": [
+      0.5,
+      0.5,
+      0.5
+    ],
+    "std": [
+      0.5,
+      0.5,
+      0.5
+    ],
+    "conversionTolerance": 0.3
+  },
+  "packs": [
+    {
+      "tier": "tiny",
+      "upstreamOfficialRecognitionWAvg": 73.5,
+      "source": {
+        "detector": {
+          "repository": "PaddlePaddle/PP-OCRv6_tiny_det_onnx",
+          "revision": "2ba1506c0380b8f0b03dd142459aac66d4421f6c"
+        },
+        "recognizer": {
+          "repository": "PaddlePaddle/PP-OCRv6_tiny_rec_onnx",
+          "revision": "2612ab37152ae0a677521bae4e1e3d4fb4cf7c30"
+        }
+      },
+      "charactersCount": 6904,
+      "conversionMaxAbsoluteError": {
+        "detector": 0.0002407226711511612,
+        "recognizer": 0.2447662651538849
+      },
+      "recognizerArgmaxMismatches": 0,
+      "archive": {
+        "name": "pp-ocr-v6-coreml-tiny-v1.aar",
+        "bytes": 2915454,
+        "sha256": "c0eba9a3affa1f2a5591e07739d9ca861d9f9417bf0258e56c1b06e9299a1aba"
+      }
+    },
+    {
+      "tier": "small",
+      "upstreamOfficialRecognitionWAvg": 81.3,
+      "source": {
+        "detector": {
+          "repository": "PaddlePaddle/PP-OCRv6_small_det_onnx",
+          "revision": "28fe5895c24fd108c19eb3e8479f4ab385fbfc62"
+        },
+        "recognizer": {
+          "repository": "PaddlePaddle/PP-OCRv6_small_rec_onnx",
+          "revision": "b8f84f0b80c529de40b4fbb3544b84fa7233a513"
+        }
+      },
+      "charactersCount": 18708,
+      "conversionMaxAbsoluteError": {
+        "detector": 0.010030455887317657,
+        "recognizer": 0.0881003737449646
+      },
+      "recognizerArgmaxMismatches": 1,
+      "archive": {
+        "name": "pp-ocr-v6-coreml-small-v1.aar",
+        "bytes": 12999796,
+        "sha256": "8f32f551fdddd7cb136ce54e7566aa453e1ca6f7c1f6a6ae7d1f75de1addfe10"
+      }
+    },
+    {
+      "tier": "medium",
+      "upstreamOfficialRecognitionWAvg": 83.2,
+      "source": {
+        "detector": {
+          "repository": "PaddlePaddle/PP-OCRv6_medium_det_onnx",
+          "revision": "61323801669c338b7891481ec7bac61ce31b576a"
+        },
+        "recognizer": {
+          "repository": "PaddlePaddle/PP-OCRv6_medium_rec_onnx",
+          "revision": "50c7eacafc52fa7bcf4194e8cd08e46f8558504b"
+        }
+      },
+      "charactersCount": 18708,
+      "conversionMaxAbsoluteError": {
+        "detector": 0.00016476213932037354,
+        "recognizer": 0.01366955041885376
+      },
+      "recognizerArgmaxMismatches": 0,
+      "archive": {
+        "name": "pp-ocr-v6-coreml-medium-v1.aar",
+        "bytes": 47521629,
+        "sha256": "960ed7c0065e3d21d1b52cc1a0ae3fb1b28911d5735f455cc82483009c3128be"
+      }
+    }
+  ]
+}

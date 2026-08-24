@@ -1,0 +1,44 @@
+name: Build and publish model release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Pack version already committed in scripts/build_models.py
+        required: true
+        default: "1"
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+      - name: Install locked conversion environment
+        run: uv sync --locked --python 3.12
+      - name: Refuse a mismatched version
+        env:
+          REQUESTED_VERSION: ${{ inputs.version }}
+        run: |
+          ACTUAL_VERSION=$(python3 -c 'import ast; p=ast.parse(open("scripts/build_models.py").read()); print(next(n.value.value for n in p.body if isinstance(n, ast.Assign) and any(isinstance(t, ast.Name) and t.id == "PACK_VERSION" for t in n.targets)))')
+          test "$ACTUAL_VERSION" = "$REQUESTED_VERSION"
+      - name: Build all pinned tiers
+        run: uv run python scripts/build_models.py --out dist
+      - name: Validate release metadata and assets
+        run: python3 scripts/check_project.py --manifest dist/manifest.json --assets dist
+      - name: Publish immutable release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ inputs.version }}
+        run: >-
+          gh release create "v${VERSION}"
+          dist/pp-ocr-v6-coreml-*-v${VERSION}.aar
+          dist/manifest.json
+          dist/SHA256SUMS
+          --title "PP-OCRv6 Core ML packages v${VERSION}"
+          --generate-notes

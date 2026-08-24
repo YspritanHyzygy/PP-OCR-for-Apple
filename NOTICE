@@ -1,0 +1,15 @@
+PP-OCR for Apple
+Copyright 2026 Yspritan
+
+This product includes software and converted model artifacts developed by
+Yspritan and distributed under the Apache License, Version 2.0.
+
+The model artifacts are derivative distributions of PP-OCRv6 models developed
+by the PaddleOCR authors and published by PaddlePaddle under Apache License 2.0:
+
+    https://github.com/PaddlePaddle/PaddleOCR
+    https://huggingface.co/collections/PaddlePaddle/pp-ocrv6
+
+This project is not affiliated with or endorsed by PaddlePaddle or Apple.
+PP-OCR and PaddlePaddle names belong to their respective owners. Apple and
+Core ML are trademarks of Apple Inc.

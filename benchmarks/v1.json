@@ -1,0 +1,112 @@
+{
+  "schemaVersion": 1,
+  "releaseTag": "v1",
+  "assetProvenance": "Byte-identical payloads migrated from YspritanHyzygy/Verto ocr-models-v1",
+  "environment": {
+    "machine": "arm64",
+    "device": "MacBook Pro",
+    "modelIdentifier": "Mac17,9",
+    "chip": "Apple M5 Pro",
+    "memory": "48 GB",
+    "macOS": "27.0",
+    "coremltools": "9.0",
+    "onnxruntime": "1.28.0",
+    "computeUnits": "ALL"
+  },
+  "method": {
+    "input": "Deterministic random Float32 tensor with seed 1",
+    "onnxProvider": "CPUExecutionProvider",
+    "coreMLComputeUnits": "ALL",
+    "warmupRuns": 1,
+    "timedRuns": 5,
+    "loadTimeIncludesCompilation": true
+  },
+  "packs": [
+    {
+      "tier": "tiny",
+      "assetSHA256": "c0eba9a3affa1f2a5591e07739d9ca861d9f9417bf0258e56c1b06e9299a1aba",
+      "upstreamOfficialRecognitionWAvg": 73.5,
+      "conversionMaxAbsoluteError": {
+        "detector": 0.0002407226711511612,
+        "recognizer": 0.2447662651538849
+      },
+      "recognizerArgmaxMismatches": 0,
+      "runtime": {
+        "tier": "tiny",
+        "detector": {
+          "loadMilliseconds": 141.87191700330004,
+          "warmupRuns": 1,
+          "timedRuns": 5,
+          "predictionMedianMilliseconds": 73.30679098959081,
+          "predictionP95Milliseconds": 73.64404201507568
+        },
+        "recognizer": {
+          "loadMilliseconds": 83.37429101811722,
+          "warmupRuns": 1,
+          "timedRuns": 5,
+          "predictionMedianMilliseconds": 6.987832981394604,
+          "predictionP95Milliseconds": 7.156000006943941
+        }
+      }
+    },
+    {
+      "tier": "small",
+      "assetSHA256": "8f32f551fdddd7cb136ce54e7566aa453e1ca6f7c1f6a6ae7d1f75de1addfe10",
+      "upstreamOfficialRecognitionWAvg": 81.3,
+      "conversionMaxAbsoluteError": {
+        "detector": 0.010030455887317657,
+        "recognizer": 0.0881003737449646
+      },
+      "recognizerArgmaxMismatches": 1,
+      "runtime": {
+        "tier": "small",
+        "detector": {
+          "loadMilliseconds": 135.54216700140387,
+          "warmupRuns": 1,
+          "timedRuns": 5,
+          "predictionMedianMilliseconds": 141.1784169904422,
+          "predictionP95Milliseconds": 142.4100830045063
+        },
+        "recognizer": {
+          "loadMilliseconds": 139.6318750048522,
+          "warmupRuns": 1,
+          "timedRuns": 5,
+          "predictionMedianMilliseconds": 20.60512499883771,
+          "predictionP95Milliseconds": 21.04516699910164
+        }
+      }
+    },
+    {
+      "tier": "medium",
+      "assetSHA256": "960ed7c0065e3d21d1b52cc1a0ae3fb1b28911d5735f455cc82483009c3128be",
+      "upstreamOfficialRecognitionWAvg": 83.2,
+      "conversionMaxAbsoluteError": {
+        "detector": 0.00016476213932037354,
+        "recognizer": 0.01366955041885376
+      },
+      "recognizerArgmaxMismatches": 0,
+      "runtime": {
+        "tier": "medium",
+        "detector": {
+          "loadMilliseconds": 178.31849999492988,
+          "warmupRuns": 1,
+          "timedRuns": 5,
+          "predictionMedianMilliseconds": 395.3822909970768,
+          "predictionP95Milliseconds": 419.07695899135433
+        },
+        "recognizer": {
+          "loadMilliseconds": 142.405292019248,
+          "warmupRuns": 1,
+          "timedRuns": 5,
+          "predictionMedianMilliseconds": 40.936000004876405,
+          "predictionP95Milliseconds": 41.22670798096806
+        }
+      }
+    }
+  ],
+  "limitations": [
+    "Runtime measurements use synthetic tensors and are not end-to-end OCR latency.",
+    "Upstream recognition W-Avg values are PaddlePaddle results, not measurements by this project.",
+    "No iPhone runtime measurement is claimed by this report."
+  ]
+}

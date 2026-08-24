@@ -1,0 +1,20 @@
+[project]
+name = "pp-ocr-for-apple"
+version = "0.1.0"
+description = "Reproducible PP-OCRv6 conversion and packaging for Core ML on Apple platforms"
+readme = "README.md"
+requires-python = ">=3.12,<3.13"
+license = "Apache-2.0"
+dependencies = [
+    "coremltools==9.0",
+    "huggingface-hub>=0.36,<2",
+    "numpy>=1.26,<3",
+    "onnx==1.17.0",
+    "onnx2torch==1.5.15",
+    "onnxruntime==1.28.0",
+    "pyyaml>=6,<7",
+    "torch==2.13.0",
+]
+
+[tool.uv]
+package = false
