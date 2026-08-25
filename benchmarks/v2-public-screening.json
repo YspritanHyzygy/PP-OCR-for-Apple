@@ -1,0 +1,130 @@
+{
+  "schemaVersion": 1,
+  "status": "incomplete-do-not-release",
+  "measuredAt": "2026-08-24",
+  "environment": {
+    "host": "MacBook Pro (Mac17,9, Apple M5 Pro, 48 GB)",
+    "runtime": "iPhone 17 Pro simulator",
+    "runtimeOS": "iOS 27.0 (24A5380i)",
+    "computeUnitsRequested": "ALL",
+    "performanceClaimAllowed": false,
+    "reason": "The simulator has no Apple Neural Engine and is not an iPhone 16 Pro measurement."
+  },
+  "corpora": {
+    "totalText": {"images": 300, "scoredLines": 2215},
+    "ctw1500DetectionOnly": {"images": 500, "scoredLines": 3075},
+    "latinDiacriticV1": {"images": 180, "scoredLines": 180},
+    "missing": ["ICDAR 2015 Challenge 4", "ICDAR 2019 MLT subsets", "private 36-photo holdout"]
+  },
+  "correctedReference": {
+    "tier": "small",
+    "totalText": {
+      "detectionPrecision": 0.41102010424422936,
+      "detectionRecall": 0.2492099322799097,
+      "detectionHmean": 0.3102866779089376,
+      "characterErrorRate": 1.2560290716881402,
+      "lineRecall": 0.24424379232505644
+    },
+    "ctw1500": {
+      "detectionPrecision": 0.6592569069545887,
+      "detectionRecall": 0.6751219512195122,
+      "detectionHmean": 0.6670951156812339
+    },
+    "latinDiacriticV1": {
+      "characterErrorRate": 0.0035346097201767305,
+      "exactLineAccuracy": 0.9333333333333333,
+      "lineRecall": 1.0
+    }
+  },
+  "b1VersusB0": {
+    "totalTextEndToEndAccuracyDelta": {
+      "lower95": -0.009962417028569199,
+      "median": 0.009407625474614378,
+      "upper95": 0.03174733860596943
+    },
+    "latinDiacriticEndToEndAccuracyDelta": {
+      "lower95": -0.0006016847172081203,
+      "median": 0.0002935133548577218,
+      "upper95": 0.0012187876220627334
+    },
+    "conclusion": "The RGB correction is mathematically required and improves the observed medians, but these available public slices alone do not establish a quality gain at the release confidence gate."
+  },
+  "candidates": [
+    {
+      "name": "small-det-tiny",
+      "change": "small detector component -> tiny detector component with box threshold 0.40",
+      "macThreeWarmupThirtyRunDeltaPercent": {
+        "archiveBytes": -21.7688,
+        "detectorP50": -40.0112,
+        "detectorP95": -46.1424
+      },
+      "totalTextDetectionRecallDeltaPoints": 1.309255078006774,
+      "totalTextDetectionPrecisionDeltaPoints": -4.095640997671345,
+      "endToEndAccuracyDeltaLower95": -0.020550752641092206,
+      "status": "rejected-quality-gate"
+    },
+    {
+      "name": "small-det640",
+      "change": "detector input 960 -> 640",
+      "macThreeWarmupThirtyRunDeltaPercent": {
+        "detectorP50": -36.8482,
+        "detectorP95": -44.6111
+      },
+      "totalTextDetectionRecallDeltaPoints": -1.8510158013544006,
+      "endToEndAccuracyDeltaLower95": -0.03693185415047568,
+      "status": "rejected-quality-gate"
+    },
+    {
+      "name": "small-det736",
+      "change": "detector input 960 -> 736",
+      "totalTextDetectionRecallDeltaPoints": -1.444695259593679,
+      "endToEndAccuracyDeltaLower95": -0.022350142601297408,
+      "status": "rejected-quality-gate"
+    },
+    {
+      "name": "small-det-medium",
+      "change": "small detector component -> medium detector component",
+      "macThreeWarmupThirtyRunDeltaPercent": {
+        "archiveBytes": 86.2772,
+        "detectorP50": 190.8840,
+        "detectorP95": 152.7436
+      },
+      "status": "rejected-pareto-runtime-and-size"
+    },
+    {
+      "name": "small-rec-int8",
+      "change": "recognizer Float16 weights -> per-channel INT8",
+      "archiveBytesDeltaPercent": -37.1127,
+      "totalTextEndToEndAccuracyDeltaLower95": -0.006867628691838723,
+      "status": "rejected-quality-gate"
+    },
+    {
+      "name": "small-rec320",
+      "change": "recognizer input width 640 -> 320",
+      "availablePublicOverallAccuracyDelta": {
+        "lower95": -0.0002651711843096482,
+        "median": 0.010351801343937872,
+        "upper95": 0.02630704540509335
+      },
+      "totalTextLineRecallDeltaPoints": -0.361173814898422,
+      "latinDiacriticExactLines": {"baseline": 168, "candidate": 172, "total": 180},
+      "availablePublicQualityGate": "pass",
+      "macThreeWarmupThirtyRunDeltaPercent": {
+        "recognizerP50": -34.8100,
+        "recognizerP95": -32.1267
+      },
+      "status": "blocked-on-missing-corpora-private-holdout-and-iphone-performance"
+    },
+    {
+      "name": "small-rec-medium",
+      "change": "small recognizer component -> medium recognizer component",
+      "macThreeWarmupThirtyRunDeltaPercent": {
+        "archiveBytes": 178.3308,
+        "recognizerP50": 119.0852,
+        "recognizerP95": 119.7768
+      },
+      "status": "rejected-pareto-runtime-and-size"
+    }
+  ],
+  "releaseDecision": "blocked"
+}

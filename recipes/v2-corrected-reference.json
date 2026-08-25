@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "packVersion": "2",
+  "name": "corrected-reference",
+  "minimumDeploymentTarget": "iOS17",
+  "computeUnits": "ALL",
+  "colorOrder": "RGB",
+  "tiers": {
+    "tiny": {
+      "detectorSourceTier": "tiny",
+      "recognizerSourceTier": "tiny",
+      "detectorInputSize": 960,
+      "recognizerInputHeight": 48,
+      "recognizerInputWidth": 640,
+      "detectorCompression": "none",
+      "recognizerCompression": "none",
+      "detectorIOType": "FLOAT32",
+      "recognizerIOType": "FLOAT32"
+    },
+    "small": {
+      "detectorSourceTier": "small",
+      "recognizerSourceTier": "small",
+      "detectorInputSize": 960,
+      "recognizerInputHeight": 48,
+      "recognizerInputWidth": 640,
+      "detectorCompression": "none",
+      "recognizerCompression": "none",
+      "detectorIOType": "FLOAT32",
+      "recognizerIOType": "FLOAT32"
+    },
+    "medium": {
+      "detectorSourceTier": "medium",
+      "recognizerSourceTier": "medium",
+      "detectorInputSize": 960,
+      "recognizerInputHeight": 48,
+      "recognizerInputWidth": 640,
+      "detectorCompression": "none",
+      "recognizerCompression": "none",
+      "detectorIOType": "FLOAT32",
+      "recognizerIOType": "FLOAT32"
+    }
+  }
+}

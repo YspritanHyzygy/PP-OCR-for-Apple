@@ -1,0 +1,143 @@
+{
+  "schemaVersion": 1,
+  "kind": "candidate-screening",
+  "reference": "v2-corrected-reference small",
+  "environment": {
+    "machine": "arm64",
+    "device": "MacBook Pro",
+    "modelIdentifier": "Mac17,9",
+    "chip": "Apple M5 Pro",
+    "memoryBytes": 51539607552,
+    "macOS": "27.0",
+    "coremltools": "9.0",
+    "computeUnits": "ALL"
+  },
+  "method": {
+    "input": "Deterministic random tensor with NumPy seed 1",
+    "warmupRuns": 1,
+    "measuredRuns": 5,
+    "status": "superseded-by-three-warmup-screening",
+    "comparison": "One setting changed from the corrected small reference per candidate"
+  },
+  "baseline": {
+    "archiveBytes": 12999764,
+    "archiveSHA256": "0929d91a241e48e69ab2dd8e961dc5f4e9559e592e2e159748f1797d686673d4",
+    "detectorP50Milliseconds": 5.216250021476299,
+    "detectorP95Milliseconds": 7.579908618936315,
+    "recognizerP50Milliseconds": 1.0867500095628202,
+    "recognizerP95Milliseconds": 1.215166598558426,
+    "detectorPackageBytes": 5061060,
+    "recognizerPackageBytes": 10665747
+  },
+  "candidates": [
+    {
+      "name": "small-det736",
+      "change": "detectorInputSize 960 -> 736",
+      "conversion": {
+        "detectorMaxAbsoluteError": 0.0010067056864500046,
+        "recognizerMaxAbsoluteError": 0.055869996547698975,
+        "recognizerArgmaxMismatches": 1
+      },
+      "macDeltaPercent": {
+        "archiveBytes": 0.0007,
+        "detectorP50": -39.1972,
+        "detectorP95": -30.4520,
+        "recognizerP50": -2.4807,
+        "recognizerP95": -5.0288
+      },
+      "status": "rejected-by-total-text-detection-recall-gate"
+    },
+    {
+      "name": "small-rec320",
+      "change": "recognizerInputWidth 640 -> 320",
+      "conversion": {
+        "detectorMaxAbsoluteError": 0.0012289471924304962,
+        "recognizerMaxAbsoluteError": 0.08940699696540833,
+        "recognizerArgmaxMismatches": 0
+      },
+      "macDeltaPercent": {
+        "archiveBytes": 0.0013,
+        "detectorP50": 1.9011,
+        "detectorP95": 0.0105,
+        "recognizerP50": -29.9939,
+        "recognizerP95": -35.1749
+      },
+      "status": "available-public-quality-pass-blocked-on-complete-corpus-iphone-and-private-holdout"
+    },
+    {
+      "name": "small-rec-int8",
+      "change": "recognizer Float16 weights -> per-channel INT8 weights",
+      "conversion": {
+        "detectorMaxAbsoluteError": 0.0012289471924304962,
+        "recognizerMaxAbsoluteError": 0.27904367446899414,
+        "recognizerArgmaxMismatches": 1
+      },
+      "macDeltaPercent": {
+        "archiveBytes": -37.1127,
+        "recognizerPackageBytes": -47.9570,
+        "recognizerP50": 2.8142,
+        "recognizerP95": -5.0172
+      },
+      "status": "rejected-by-total-text-bootstrap-quality-gate"
+    },
+    {
+      "name": "small-det-palette8",
+      "change": "detector Float16 weights -> per-tensor 8-bit palette",
+      "conversion": {
+        "detectorMaxAbsoluteError": 0.0045068152248859406,
+        "recognizerMaxAbsoluteError": 0.055869996547698975,
+        "recognizerArgmaxMismatches": 1
+      },
+      "macDeltaPercent": {
+        "archiveBytes": -15.8692,
+        "detectorPackageBytes": -47.0348,
+        "detectorP50": 23.3996,
+        "detectorP95": 83.0664
+      },
+      "status": "rejected-by-mac-runtime-gate"
+    },
+    {
+      "name": "small-det-int8",
+      "change": "detector Float16 weights -> per-channel INT8 weights",
+      "conversion": {
+        "detectorMaxAbsoluteError": 0.01604132354259491,
+        "limit": 0.011
+      },
+      "status": "rejected-by-conversion-fidelity"
+    },
+    {
+      "name": "small-rec-palette8",
+      "change": "recognizer Float16 weights -> per-tensor 8-bit palette",
+      "conversion": {
+        "recognizerMaxAbsoluteError": 0.5691444277763367,
+        "limit": 0.3
+      },
+      "status": "rejected-by-conversion-fidelity"
+    },
+    {
+      "name": "small-det-palette6",
+      "change": "detector Float16 weights -> per-tensor 6-bit palette",
+      "conversion": {
+        "detectorMaxAbsoluteError": 0.02345319837331772,
+        "limit": 0.011
+      },
+      "status": "rejected-by-conversion-fidelity"
+    },
+    {
+      "name": "small-rec-palette6",
+      "change": "recognizer Float16 weights -> per-tensor 6-bit palette",
+      "conversion": {
+        "recognizerMaxAbsoluteError": 0.7953701019287109,
+        "limit": 0.3
+      },
+      "status": "rejected-by-conversion-fidelity"
+    }
+  ],
+  "limitations": [
+    "Synthetic tensors do not establish OCR quality.",
+    "Mac timing does not establish iPhone latency, memory, or energy.",
+    "The iPhone 16 Pro was offline during this screening.",
+    "An iOS 17 simulator runtime was not installed.",
+    "ICDAR authenticated archives and the private 36-photo final holdout were unavailable."
+  ]
+}

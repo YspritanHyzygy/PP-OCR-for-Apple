@@ -4,9 +4,12 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: Pack version already committed in scripts/build_models.py
+        description: Pack version already committed in the selected recipe
         required: true
-        default: "1"
+        default: "2"
+      recipe:
+        description: Committed release recipe
+        required: true
 
 permissions:
   contents: write
@@ -24,13 +27,27 @@ jobs:
       - name: Refuse a mismatched version
         env:
           REQUESTED_VERSION: ${{ inputs.version }}
+          RECIPE: ${{ inputs.recipe }}
         run: |
-          ACTUAL_VERSION=$(python3 -c 'import ast; p=ast.parse(open("scripts/build_models.py").read()); print(next(n.value.value for n in p.body if isinstance(n, ast.Assign) and any(isinstance(t, ast.Name) and t.id == "PACK_VERSION" for t in n.targets)))')
+          ACTUAL_VERSION=$(python3 -c 'import json, os; print(json.load(open(os.environ["RECIPE"]))["packVersion"])')
           test "$ACTUAL_VERSION" = "$REQUESTED_VERSION"
+      - name: Require complete corpus and release metadata
+        run: >-
+          python3 scripts/check_project.py
+          --recipe "${{ inputs.recipe }}"
+          --require-release-ready
       - name: Build all pinned tiers
-        run: uv run python scripts/build_models.py --out dist
+        run: >-
+          uv run python scripts/build_models.py
+          --recipe "${{ inputs.recipe }}"
+          --out dist
       - name: Validate release metadata and assets
-        run: python3 scripts/check_project.py --manifest dist/manifest.json --assets dist
+        run: >-
+          python3 scripts/check_project.py
+          --recipe "${{ inputs.recipe }}"
+          --manifest dist/manifest.json
+          --assets dist
+          --require-release-ready
       - name: Publish immutable release
         env:
           GH_TOKEN: ${{ github.token }}

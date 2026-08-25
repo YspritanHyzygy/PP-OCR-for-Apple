@@ -6,7 +6,7 @@
 #  you may not use this file except in compliance with the License.
 #  You may obtain a copy of the License at
 #
-#      http://www.apache.org/licenses/LICENSE-2.0
+#  http://www.apache.org/licenses/LICENSE-2.0
 #
 #  Unless required by applicable law or agreed to in writing, software
 #  distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,314 +14,542 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 #
-"""把锁定版本的 PP-OCRv6 官方 ONNX 转成 Core ML 模型包，三档各一个。
+"""Build versioned PP-OCRv6 Core ML packages from one explicit recipe.
 
-每档产出一个 Apple Archive（.aar），内含：
-    VertoTextDetector.mlpackage/     DB 文字检测，输入固定 1×3×960×960
-    VertoTextRecognizer.mlpackage/   CTC 文字识别，输入固定 1×3×48×640
-    charset.txt                      字符表，逐行（tiny 6904 条、其余 18708 条）
-另在产物根目录写一份 manifest.json，含各档体积与 SHA-256。
-
-为什么不直接用官方 ONNX：那要往 app 里链进 ONNX Runtime（25MB+ 的 C++ 运行时），
-IPA 直接变大。转成 Core ML 后 IPA 一个字节都不增加，还能上神经引擎，
-且 fp16 让下载体积减半。代价是转换链路长，所以本脚本每步都自带数值核对：
-auto_pad 改写必须逐位相同，fp16 转换的误差必须在阈值内，否则直接失败。
-
-为什么打成 .aar 而不是 .zip：iOS 没有公开的解 zip API，
-而 AppleArchive 是系统 Swift 模块（iOS 14+），app 侧因此不需要任何三方库。
-
-依赖（必须 Python 3.12，coremltools/onnx2torch 没有 3.13+ 的 wheel）：
-    uv sync --locked --python 3.12
-
-用法：
-    uv run python scripts/build_models.py --out dist
-    uv run python scripts/build_models.py --out ... --tier small
+The builder owns source selection, the Apple-facing RGB contract, input shapes,
+weight compression, numerical checks, archive creation, and release metadata.
+Candidate and release builds use this same implementation; a recipe changes
+inputs, not code paths.
 """
+
+from __future__ import annotations
+
 import argparse
 import hashlib
 import json
+import re
 import shutil
 import subprocess
-import sys
 from pathlib import Path
+from typing import Any
 
+import coremltools as ct
+import coremltools.optimize as cto
 import numpy as np
 import onnx
 import onnxruntime as ort
 import torch
 import yaml
-from onnx import helper
+from onnx import helper, numpy_helper
 from onnx2torch import convert as onnx2torch_convert
 
-import coremltools as ct
 
-# ── 模型选型 ────────────────────────────────────────────────────────────────
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE_LOCK = json.loads((ROOT / "sources.lock.json").read_text(encoding="utf-8"))
+DEFAULT_RECIPE = ROOT / "recipes/v2-corrected-reference.json"
+TIERS = ("tiny", "small", "medium")
+COMPONENTS = ("detector", "recognizer")
 
-# PP-OCRv6 只有 tiny / small / medium 三档，三档全部构建，由用户在设置里选。
-# 准确率取自 PaddleOCR 官方 16 类真实照片基准的加权平均（W-Avg）。
-TIERS = {
-    "tiny":   {"accuracy": 73.5},
-    "small":  {"accuracy": 81.3},
-    "medium": {"accuracy": 83.2},
+# PaddlePaddle's internal multi-scenario benchmark. These values provide
+# provenance and tier context; project reports never relabel them as local or
+# end-to-end accuracy.
+UPSTREAM_METRICS = {
+    "tiny": {"detectorHmean": 80.6, "recognizerWAvg": 73.5},
+    "small": {"detectorHmean": 84.1, "recognizerWAvg": 81.3},
+    "medium": {"detectorHmean": 86.2, "recognizerWAvg": 83.2},
 }
-PACK_VERSION = "1"
 
-# 检测输入固定 960×960（letterbox）。Core ML 的动态形状会退出神经引擎，
-# 固定形状换来 ANE 加速；浪费掉的那点算力在几十毫秒的量级上无所谓。
-DET_SIZE = 960
-# 识别输入固定 48×640，即 13.3:1。单行文字极少超过这个长宽比，
-# 更宽的行按比例压缩进来，更窄的右侧补零（与官方 padding 行为一致）。
-REC_HEIGHT, REC_WIDTH = 48, 640
-
-# 检测预处理用 ImageNet 均值方差，识别用 (x-0.5)/0.5，均照搬 PaddleOCR 官方配置。
-DET_MEAN, DET_STD = [0.485, 0.456, 0.406], [0.229, 0.224, 0.225]
-REC_MEAN, REC_STD = [0.5, 0.5, 0.5], [0.5, 0.5, 0.5]
-
-# 转换后与原 ONNX 的最大绝对误差上限。fp16 有效位约 3 位十进制。
-# 检测输出是 0~1 概率图（判据阈值 0.3），所以只在迁移版 v1 实测
-# 0.01003 上留到 0.011；识别输出是
-# logits，产品的 CTC 解码只读 argmax。迁移版 v1 在锁定输入上的最大 logit
-# 误差已超过原来凭空写下的 0.20，因此这里用实测值校准上限，并额外记录
-# argmax 差异；真实文字是否一致仍由端到端 OCR 探针判定，不能拿随机噪声判卷。
 DET_TOLERANCE = 0.011
 REC_TOLERANCE = 0.30
+REC_MEAN = [0.5, 0.5, 0.5]
+REC_STD = [0.5, 0.5, 0.5]
+FLOAT32 = 65568
+FLOAT16 = 65552
+VALID_COMPRESSIONS = {"none", "int8", "palette8", "palette6"}
+VALID_IO_TYPES = {"FLOAT32", "FLOAT16"}
+RECIPE_NAME = re.compile(r"^[a-z0-9][a-z0-9-]*$")
 
 
 def sha256(path: Path) -> str:
-    h = hashlib.sha256()
-    with path.open("rb") as f:
-        for chunk in iter(lambda: f.read(1 << 20), b""):
-            h.update(chunk)
-    return h.hexdigest()
+    value = hashlib.sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1 << 20), b""):
+            value.update(chunk)
+    return value.hexdigest()
 
 
-def fetch(repo: str, revision: str, dest: Path) -> Path:
+def load_recipe(path: Path) -> dict[str, Any]:
+    recipe = json.loads(path.read_text(encoding="utf-8"))
+    if recipe.get("schemaVersion") != 1:
+        raise SystemExit(f"{path}: unsupported recipe schema")
+    if not RECIPE_NAME.fullmatch(str(recipe.get("name", ""))):
+        raise SystemExit(f"{path}: name must use lowercase letters, digits, and hyphens")
+    if not str(recipe.get("packVersion", "")).isdigit():
+        raise SystemExit(f"{path}: packVersion must contain digits only")
+    if recipe.get("minimumDeploymentTarget") != "iOS17":
+        raise SystemExit(f"{path}: v2 recipes must preserve the iOS17 floor")
+    if recipe.get("computeUnits") != "ALL":
+        raise SystemExit(f"{path}: computeUnits must be ALL")
+    if recipe.get("colorOrder") != "RGB":
+        raise SystemExit(f"{path}: Apple-facing v2 recipes must use RGB")
+    if tuple(recipe.get("tiers", {})) != TIERS:
+        raise SystemExit(f"{path}: tiers must be ordered as {TIERS}")
+
+    for output_tier, config in recipe["tiers"].items():
+        for key in ("detectorSourceTier", "recognizerSourceTier"):
+            if config.get(key) not in TIERS:
+                raise SystemExit(f"{path}: {output_tier}.{key} is invalid")
+        if config.get("detectorInputSize") not in {640, 736, 960}:
+            raise SystemExit(f"{path}: {output_tier}.detectorInputSize is not a measured candidate")
+        if config.get("recognizerInputHeight") != 48:
+            raise SystemExit(f"{path}: recognizer height must remain 48")
+        if config.get("recognizerInputWidth") not in {320, 640}:
+            raise SystemExit(f"{path}: {output_tier}.recognizerInputWidth is not a measured candidate")
+        for component in COMPONENTS:
+            compression = config.get(f"{component}Compression")
+            io_type = config.get(f"{component}IOType")
+            if compression not in VALID_COMPRESSIONS:
+                raise SystemExit(f"{path}: {output_tier}.{component}Compression is invalid")
+            if io_type not in VALID_IO_TYPES:
+                raise SystemExit(f"{path}: {output_tier}.{component}IOType is invalid")
+    return recipe
+
+
+def fetch(repo: str, revision: str, destination: Path) -> Path:
     from huggingface_hub import snapshot_download
-    print(f"  下载 {repo}@{revision}")
-    snapshot_download(repo, revision=revision, local_dir=str(dest))
-    return dest
+
+    print(f"  download {repo}@{revision}")
+    snapshot_download(repo, revision=revision, local_dir=str(destination))
+    return destination
 
 
-def source_for(tier: str, component: str) -> dict:
+def source_for(tier: str, component: str) -> dict[str, str]:
     source = SOURCE_LOCK["tiers"][tier][component]
+    return {"repository": source["repository"], "revision": source["revision"]}
+
+
+def transform(config: dict[str, Any], name: str) -> dict[str, Any]:
+    for item in config["PreProcess"]["transform_ops"]:
+        if name in item:
+            return item[name] or {}
+    raise SystemExit(f"inference.yml does not contain {name}")
+
+
+def read_source_contract(directory: Path, component: str) -> dict[str, Any]:
+    config = yaml.safe_load((directory / "inference.yml").read_text(encoding="utf-8"))
+    decoded = transform(config, "DecodeImage")
+    if decoded.get("img_mode") != "BGR":
+        raise SystemExit(f"{directory}: expected the locked upstream model to declare BGR input")
+
+    if component == "detector":
+        normalized = transform(config, "NormalizeImage")
+        post = config["PostProcess"]
+        return {
+            "upstreamColorOrder": "BGR",
+            "upstreamMean": [float(value) for value in normalized["mean"]],
+            "upstreamStd": [float(value) for value in normalized["std"]],
+            "postProcess": {
+                "binarizationThreshold": float(post["thresh"]),
+                "boxScoreThreshold": float(post["box_thresh"]),
+                "unclipRatio": float(post["unclip_ratio"]),
+                "maximumCandidates": int(post["max_candidates"]),
+            },
+        }
+
+    resized = transform(config, "RecResizeImg")
     return {
-        "repository": source["repository"],
-        "revision": source["revision"],
+        "upstreamColorOrder": "BGR",
+        "upstreamImageShape": [int(value) for value in resized["image_shape"]],
+        "characterDict": [str(value) for value in config["PostProcess"]["character_dict"]],
     }
 
 
-def rewrite_auto_pad(src: Path, dst: Path) -> int:
-    """把 SAME_UPPER 自动填充改写成显式 pads。
+def initializer(model: onnx.ModelProto, name: str) -> onnx.TensorProto:
+    for tensor in model.graph.initializer:
+        if tensor.name == name:
+            return tensor
+    raise SystemExit(f"ONNX initializer {name!r} was not found")
 
-    onnx2torch 不支持 SAME_UPPER，而 det/rec 各有 3 个这样的节点。
-    它们全是 kernel=2×2 / stride=1 / dilation=1，此配置下
-        pad_total = (out-1)*stride + (kernel-1)*dilation + 1 - in = kernel-1 = 1
-    与输入尺寸无关，SAME_UPPER 把多的 1 放末端 → pads=[0,0,1,1]。
-    所以改写后对任意输入尺寸都等价，不会把模型钉死在某个分辨率。
-    stride/dilation 不全为 1 时 padding 依赖输入尺寸，此时直接报错而不是算错。
+
+def fold_bgr_input_to_rgb(source: Path, destination: Path) -> None:
+    """Reverse the first convolution's input-channel weights.
+
+    Upstream receives normalized B, G, R planes. The resulting graph receives
+    the mathematically equivalent R, G, B tensor and contains no runtime
+    channel-shuffle operation.
     """
-    model = onnx.load(str(src))
+
+    model = onnx.load(str(source))
+    input_name = model.graph.input[0].name
+    consumers = [node for node in model.graph.node if input_name in node.input]
+    if len(consumers) != 1 or consumers[0].op_type != "Conv":
+        details = [(node.name, node.op_type) for node in consumers]
+        raise SystemExit(f"{source}: expected one first Conv consuming {input_name}, found {details}")
+    node = consumers[0]
+    attributes = {attribute.name: attribute for attribute in node.attribute}
+    groups = int(attributes["group"].i) if "group" in attributes else 1
+    if groups != 1:
+        raise SystemExit(f"{source}: first convolution uses group={groups}; channel folding is undefined")
+
+    weight = initializer(model, node.input[1])
+    values = numpy_helper.to_array(weight)
+    if values.ndim < 2 or values.shape[1] != 3:
+        raise SystemExit(f"{source}: first convolution weight shape {values.shape} has no RGB axis")
+    folded = np.ascontiguousarray(values[:, [2, 1, 0], ...])
+    weight.CopyFrom(numpy_helper.from_array(folded, name=weight.name))
+    onnx.checker.check_model(model)
+    onnx.save(model, str(destination))
+
+
+def run_onnx(path: Path, x: np.ndarray) -> np.ndarray:
+    return ort.InferenceSession(
+        str(path), providers=["CPUExecutionProvider"]
+    ).run(None, {"x": x})[0]
+
+
+def assert_rgb_fold_is_equivalent(original: Path, folded: Path, shape: tuple[int, ...]) -> float:
+    bgr = np.random.default_rng(17).normal(0, 1, shape).astype(np.float32)
+    rgb = np.ascontiguousarray(bgr[:, [2, 1, 0], ...])
+    reference = run_onnx(original, bgr)
+    candidate = run_onnx(folded, rgb)
+    delta = float(np.abs(reference - candidate).max())
+    if not np.allclose(reference, candidate, rtol=1e-5, atol=1e-5):
+        raise SystemExit(f"RGB first-convolution fold changed ONNX output (max error {delta})")
+    print(f"     RGB fold equivalence max error {delta:.8f}")
+    return delta
+
+
+def rewrite_auto_pad(source: Path, destination: Path) -> int:
+    """Replace the supported SAME_UPPER nodes with explicit padding."""
+
+    model = onnx.load(str(source))
     changed = 0
     for node in model.graph.node:
-        attrs = {a.name: a for a in node.attribute}
-        auto_pad = attrs.get("auto_pad")
+        attributes = {attribute.name: attribute for attribute in node.attribute}
+        auto_pad = attributes.get("auto_pad")
         if auto_pad is None or auto_pad.s.decode() != "SAME_UPPER":
             continue
-        kernel = list(attrs["kernel_shape"].ints)
-        strides = list(attrs["strides"].ints) if "strides" in attrs else [1] * len(kernel)
-        dilations = list(attrs["dilations"].ints) if "dilations" in attrs else [1] * len(kernel)
-        if any(s != 1 for s in strides) or any(d != 1 for d in dilations):
+        kernel = list(attributes["kernel_shape"].ints)
+        strides = list(attributes["strides"].ints) if "strides" in attributes else [1] * len(kernel)
+        dilations = list(attributes["dilations"].ints) if "dilations" in attributes else [1] * len(kernel)
+        if any(value != 1 for value in strides) or any(value != 1 for value in dilations):
             raise SystemExit(
-                f"{node.op_type}: stride={strides} dilation={dilations} 不全为 1，"
-                "SAME_UPPER 的 padding 此时依赖输入尺寸，不能按固定值改写"
+                f"{node.op_type}: stride={strides} dilation={dilations} cannot use a fixed SAME_UPPER rewrite"
             )
-        begin = [(k - 1) // 2 for k in kernel]
-        end = [(k - 1) - b for k, b in zip(kernel, begin)]
+        begin = [(value - 1) // 2 for value in kernel]
+        end = [(value - 1) - start for value, start in zip(kernel, begin)]
         node.attribute.remove(auto_pad)
-        if "pads" in attrs:
-            node.attribute.remove(attrs["pads"])
+        if "pads" in attributes:
+            node.attribute.remove(attributes["pads"])
         node.attribute.append(helper.make_attribute("pads", begin + end))
         changed += 1
     onnx.checker.check_model(model)
-    onnx.save(model, str(dst))
+    onnx.save(model, str(destination))
     return changed
 
 
-def assert_rewrite_is_exact(original: Path, rewritten: Path, shape) -> None:
-    """改写只是把隐式 padding 写成显式，必须逐位相同，不允许有任何误差。"""
+def assert_rewrite_is_exact(original: Path, rewritten: Path, shape: tuple[int, ...]) -> None:
     x = np.random.default_rng(0).random(shape).astype(np.float32)
-    def run(p):
-        return ort.InferenceSession(str(p), providers=["CPUExecutionProvider"]).run(None, {"x": x})[0]
-    delta = np.abs(run(original) - run(rewritten)).max()
+    delta = float(np.abs(run_onnx(original, x) - run_onnx(rewritten, x)).max())
     if delta != 0:
-        raise SystemExit(f"auto_pad 改写改变了输出（最大误差 {delta}），拒绝继续")
-    print(f"     auto_pad 改写核对：逐位相同")
+        raise SystemExit(f"auto_pad rewrite changed output (max error {delta})")
+    print("     auto_pad rewrite is bit-exact")
+
+
+def apply_weight_compression(model: ct.models.MLModel, mode: str) -> ct.models.MLModel:
+    if mode == "none":
+        return model
+    if mode == "int8":
+        op_config = cto.coreml.OpLinearQuantizerConfig(
+            mode="linear_symmetric", granularity="per_channel", weight_threshold=2048
+        )
+        config = cto.coreml.OptimizationConfig(global_config=op_config)
+        return cto.coreml.linear_quantize_weights(model, config=config)
+    if mode in {"palette8", "palette6"}:
+        bits = int(mode.removeprefix("palette"))
+        op_config = cto.coreml.OpPalettizerConfig(
+            mode="kmeans", nbits=bits, granularity="per_tensor", weight_threshold=2048
+        )
+        config = cto.coreml.OptimizationConfig(global_config=op_config)
+        return cto.coreml.palettize_weights(model, config=config)
+    raise SystemExit(f"unsupported compression mode {mode}")
+
+
+def numpy_dtype(io_type: str) -> type[np.floating[Any]]:
+    return np.float32 if io_type == "FLOAT32" else np.float16
+
+
+def protobuf_dtype(io_type: str) -> int:
+    return FLOAT32 if io_type == "FLOAT32" else FLOAT16
 
 
 def to_coreml(
-    onnx_path: Path, out: Path, shape, tolerance: float, label: str,
+    onnx_path: Path,
+    output: Path,
+    shape: tuple[int, ...],
+    tolerance: float,
+    label: str,
+    compression: str,
+    io_type: str,
     require_argmax_equal: bool = False,
-):
+) -> tuple[float, int]:
     torch_model = onnx2torch_convert(onnx.load(str(onnx_path)))
     torch_model.eval()
+    torch.manual_seed(0)
     traced = torch.jit.trace(torch_model, torch.rand(*shape), strict=False)
+    boundary_dtype = numpy_dtype(io_type)
     model = ct.convert(
         traced,
-        inputs=[ct.TensorType(name="x", shape=shape, dtype=np.float32)],
-        # 必须显式钉死输出为 float32。不写这一项时 coremltools 会跟随
-        # compute_precision 把输出也标成 float16，而 app 侧按 float32 读那块缓冲
-        # 会越界读两倍长度、直接崩进程（实测踩过）。权重仍是 fp16，
-        # 体积不受影响，只有输出张量按 float32 交付。
-        outputs=[ct.TensorType(dtype=np.float32)],
+        inputs=[ct.TensorType(name="x", shape=shape, dtype=boundary_dtype)],
+        outputs=[ct.TensorType(dtype=boundary_dtype)],
         minimum_deployment_target=ct.target.iOS17,
         compute_precision=ct.precision.FLOAT16,
         compute_units=ct.ComputeUnit.ALL,
     )
-    model.save(str(out))
+    model = apply_weight_compression(model, compression)
+    model.save(str(output))
 
-    spec = model.get_spec().description
-    for feature in list(spec.input) + list(spec.output):
-        kind = feature.type.multiArrayType.dataType
-        if kind != 65568:  # 65568 = FLOAT32，65552 = FLOAT16
-            raise SystemExit(f"{label}: {feature.name} 的数据类型是 {kind}，不是 FLOAT32")
+    expected_type = protobuf_dtype(io_type)
+    for feature in list(model.get_spec().description.input) + list(model.get_spec().description.output):
+        actual = feature.type.multiArrayType.dataType
+        if actual != expected_type:
+            raise SystemExit(f"{label}: feature {feature.name} has data type {actual}, expected {expected_type}")
 
-    x = np.random.default_rng(1).random(shape).astype(np.float32)
-    ref = ort.InferenceSession(str(onnx_path), providers=["CPUExecutionProvider"]).run(None, {"x": x})[0]
-    got = list(ct.models.MLModel(str(out)).predict({"x": x}).values())[0]
-    if ref.shape != got.shape:
-        raise SystemExit(f"{label}: 形状不一致 onnx{ref.shape} vs coreml{got.shape}")
-    delta = float(np.abs(ref - got).max())
-    print(f"     {label} 转换核对：最大绝对误差 {delta:.5f}（上限 {tolerance}）")
+    boundary_input = np.random.default_rng(1).random(shape).astype(boundary_dtype)
+    reference = run_onnx(onnx_path, boundary_input.astype(np.float32))
+    candidate = list(ct.models.MLModel(str(output)).predict({"x": boundary_input}).values())[0]
+    if reference.shape != candidate.shape:
+        raise SystemExit(f"{label}: ONNX {reference.shape} and Core ML {candidate.shape} differ")
+    delta = float(np.abs(reference - candidate.astype(np.float32)).max())
+    print(f"     {label} Core ML max error {delta:.5f} (limit {tolerance})")
     if delta > tolerance:
-        raise SystemExit(f"{label}: fp16 误差 {delta} 超出上限 {tolerance}")
+        raise SystemExit(f"{label}: Core ML error {delta} exceeds {tolerance}")
+
     mismatches = 0
     if require_argmax_equal:
-        mismatches = int(np.count_nonzero(np.argmax(ref, axis=-1) != np.argmax(got, axis=-1)))
-        print(f"     {label} CTC argmax 差异：{mismatches}")
+        mismatches = int(
+            np.count_nonzero(np.argmax(reference, axis=-1) != np.argmax(candidate, axis=-1))
+        )
+        print(f"     {label} CTC argmax mismatches {mismatches}")
     return delta, mismatches
 
 
-def build_tier(tier: str, work: Path, out_root: Path) -> dict:
-    detector_source = source_for(tier, "detector")
-    recognizer_source = source_for(tier, "recognizer")
-    out = out_root / tier
-    if out.exists():
-        shutil.rmtree(out)
-    out.mkdir(parents=True)
+def build_component(
+    output_tier: str,
+    component: str,
+    source_tier: str,
+    source_dir: Path,
+    work_dir: Path,
+    output_dir: Path,
+    shape: tuple[int, ...],
+    compression: str,
+    io_type: str,
+) -> tuple[dict[str, Any], dict[str, Any]]:
+    contract = read_source_contract(source_dir, component)
+    component_work = work_dir / output_tier / component
+    component_work.mkdir(parents=True, exist_ok=True)
+    rgb_onnx = component_work / "inference_rgb.onnx"
+    fixed_onnx = component_work / "inference_rgb_fixed.onnx"
 
-    print(f"\n=== {tier} ===")
-    print("  [1/5] 取官方 ONNX")
-    det_dir = fetch(
-        detector_source["repository"], detector_source["revision"], work / tier / "det"
+    source_onnx = source_dir / "inference.onnx"
+    fold_bgr_input_to_rgb(source_onnx, rgb_onnx)
+    rgb_error = assert_rgb_fold_is_equivalent(source_onnx, rgb_onnx, shape)
+    changed = rewrite_auto_pad(rgb_onnx, fixed_onnx)
+    print(f"     {component}: rewrote {changed} SAME_UPPER nodes")
+    assert_rewrite_is_exact(rgb_onnx, fixed_onnx, shape)
+
+    filename = "VertoTextDetector.mlpackage" if component == "detector" else "VertoTextRecognizer.mlpackage"
+    tolerance = DET_TOLERANCE if component == "detector" else REC_TOLERANCE
+    conversion_error, argmax_mismatches = to_coreml(
+        fixed_onnx,
+        output_dir / filename,
+        shape,
+        tolerance,
+        f"{output_tier}.{component}",
+        compression,
+        io_type,
+        require_argmax_equal=component == "recognizer",
     )
-    rec_dir = fetch(
-        recognizer_source["repository"], recognizer_source["revision"], work / tier / "rec"
+    source = source_for(source_tier, component)
+    metadata = {
+        "sourceTier": source_tier,
+        "source": source,
+        "inputShape": list(shape),
+        "inputOutputType": io_type,
+        "computePrecision": "FLOAT16",
+        "weightCompression": compression,
+        "rgbFoldMaxAbsoluteError": rgb_error,
+        "conversionMaxAbsoluteError": conversion_error,
+    }
+    if component == "recognizer":
+        metadata["argmaxMismatches"] = argmax_mismatches
+    return contract, metadata
+
+
+def build_tier(
+    output_tier: str,
+    config: dict[str, Any],
+    version: str,
+    sources_root: Path,
+    work_root: Path,
+    output_root: Path,
+) -> dict[str, Any]:
+    output = output_root / output_tier
+    if output.exists():
+        shutil.rmtree(output)
+    output.mkdir(parents=True)
+
+    detector_source_tier = config["detectorSourceTier"]
+    recognizer_source_tier = config["recognizerSourceTier"]
+    source_dirs: dict[str, Path] = {}
+    for component, source_tier in (
+        ("detector", detector_source_tier),
+        ("recognizer", recognizer_source_tier),
+    ):
+        source = source_for(source_tier, component)
+        source_dirs[component] = fetch(
+            source["repository"],
+            source["revision"],
+            sources_root / source_tier / component,
+        )
+
+    print(f"\n=== {output_tier} ===")
+    detector_shape = (1, 3, config["detectorInputSize"], config["detectorInputSize"])
+    recognizer_shape = (
+        1,
+        3,
+        config["recognizerInputHeight"],
+        config["recognizerInputWidth"],
+    )
+    detector_contract, detector_metadata = build_component(
+        output_tier,
+        "detector",
+        detector_source_tier,
+        source_dirs["detector"],
+        work_root,
+        output,
+        detector_shape,
+        config["detectorCompression"],
+        config["detectorIOType"],
+    )
+    recognizer_contract, recognizer_metadata = build_component(
+        output_tier,
+        "recognizer",
+        recognizer_source_tier,
+        source_dirs["recognizer"],
+        work_root,
+        output,
+        recognizer_shape,
+        config["recognizerCompression"],
+        config["recognizerIOType"],
     )
 
-    print("  [2/5] 改写 SAME_UPPER 自动填充")
-    for tag, d, shape in [("det", det_dir, (1, 3, DET_SIZE, DET_SIZE)),
-                          ("rec", rec_dir, (1, 3, REC_HEIGHT, REC_WIDTH))]:
-        src, dst = d / "inference.onnx", d / "inference_fixed.onnx"
-        n = rewrite_auto_pad(src, dst)
-        print(f"     {tag}: 改写 {n} 个节点")
-        assert_rewrite_is_exact(src, dst, shape)
+    characters = recognizer_contract["characterDict"]
+    if any("\n" in character for character in characters):
+        raise SystemExit(f"{output_tier}: character dictionary contains a newline")
+    (output / "charset.txt").write_text("\n".join(characters) + "\n", encoding="utf-8")
 
-    print("  [3/5] 转 Core ML (fp16)")
-    det_err, _ = to_coreml(
-        det_dir / "inference_fixed.onnx", out / "VertoTextDetector.mlpackage",
-        (1, 3, DET_SIZE, DET_SIZE), DET_TOLERANCE, "det"
-    )
-    rec_err, rec_argmax_mismatches = to_coreml(
-        rec_dir / "inference_fixed.onnx", out / "VertoTextRecognizer.mlpackage",
-        (1, 3, REC_HEIGHT, REC_WIDTH), REC_TOLERANCE, "rec", require_argmax_equal=True
-    )
-
-    print("  [4/5] 导出字符表")
-    charset = yaml.safe_load((rec_dir / "inference.yml").read_text())["PostProcess"]["character_dict"]
-    # 原样逐行写，一个字符都不许清洗：字表里有一条是全角空格 U+3000，
-    # 任何 strip 都会把它变成空串，从而让其后所有字符的索引整体错位一位。
-    if any("\n" in c for c in charset):
-        raise SystemExit("字表条目含换行，逐行格式会错位")
-    (out / "charset.txt").write_text("\n".join(charset) + "\n", encoding="utf-8")
-    print(f"     {len(charset)} 条字符")
-
-    print("  [5/5] 打包")
-    # 打成 Apple Archive 而不是 zip：iOS 没有公开的解 zip API，
-    # 而 AppleArchive 是系统 Swift 模块（iOS 14+），app 侧不需要任何三方库。
-    # lzfse 体积与 zlib 基本持平但解压快得多。
-    archive = out_root / f"pp-ocr-v6-coreml-{tier}-v{PACK_VERSION}.aar"
+    archive = output_root / f"pp-ocr-v6-coreml-{output_tier}-v{version}.aar"
     archive.unlink(missing_ok=True)
     subprocess.run(
-        ["aa", "archive", "-d", str(out), "-o", str(archive), "-a", "lzfse", "-b", "1m"],
+        ["aa", "archive", "-d", str(output), "-o", str(archive), "-a", "lzfse", "-b", "1m"],
         check=True,
     )
-    size = archive.stat().st_size
-    print(f"     {archive.name}  {size / 1048576:.1f} MB")
 
+    detector_mean = list(reversed(detector_contract["upstreamMean"]))
+    detector_std = list(reversed(detector_contract["upstreamStd"]))
     return {
-        "tier": tier,
-        "upstreamOfficialRecognitionWAvg": TIERS[tier]["accuracy"],
-        "source": {"detector": detector_source, "recognizer": recognizer_source},
-        "charactersCount": len(charset),
-        "conversionMaxAbsoluteError": {"detector": det_err, "recognizer": rec_err},
-        "recognizerArgmaxMismatches": rec_argmax_mismatches,
-        "archive": {"name": archive.name, "bytes": size, "sha256": sha256(archive)},
+        "tier": output_tier,
+        "upstream": {
+            "detectorHmean": UPSTREAM_METRICS[detector_source_tier]["detectorHmean"],
+            "recognizerWAvg": UPSTREAM_METRICS[recognizer_source_tier]["recognizerWAvg"],
+        },
+        "detector": {
+            **detector_metadata,
+            "colorOrder": "RGB",
+            "mean": detector_mean,
+            "std": detector_std,
+            "postProcess": detector_contract["postProcess"],
+        },
+        "recognizer": {
+            **recognizer_metadata,
+            "colorOrder": "RGB",
+            "mean": REC_MEAN,
+            "std": REC_STD,
+            "charactersCount": len(characters),
+        },
+        "archive": {
+            "name": archive.name,
+            "bytes": archive.stat().st_size,
+            "sha256": sha256(archive),
+        },
     }
 
 
 def main() -> None:
-    ap = argparse.ArgumentParser()
-    ap.add_argument("--out", required=True, type=Path, help="产物目录")
-    ap.add_argument("--work", type=Path, default=Path("build"), help="中间文件目录")
-    ap.add_argument("--tier", action="append", choices=sorted(TIERS),
-                    help="只构建指定档位，可重复；默认三档全建")
-    args = ap.parse_args()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--out", required=True, type=Path, help="output directory")
+    parser.add_argument("--work", type=Path, default=Path("build"), help="intermediate directory")
+    parser.add_argument("--recipe", type=Path, default=DEFAULT_RECIPE, help="versioned build recipe")
+    parser.add_argument("--tier", action="append", choices=TIERS, help="build one or more tiers")
+    args = parser.parse_args()
 
-    work, out_root = args.work.resolve(), args.out.resolve()
-    work.mkdir(parents=True, exist_ok=True)
-    out_root.mkdir(parents=True, exist_ok=True)
+    recipe_path = args.recipe.resolve()
+    recipe = load_recipe(recipe_path)
+    work_root = args.work.resolve()
+    recipe_work = work_root / recipe["name"]
+    output_root = args.out.resolve()
+    sources_root = recipe_work / "sources"
+    recipe_work.mkdir(parents=True, exist_ok=True)
+    output_root.mkdir(parents=True, exist_ok=True)
 
-    packs = [build_tier(t, work, out_root) for t in (args.tier or ["tiny", "small", "medium"])]
-
+    selected = args.tier or list(TIERS)
+    packs = [
+        build_tier(
+            tier,
+            recipe["tiers"][tier],
+            recipe["packVersion"],
+            sources_root,
+            recipe_work / "converted",
+            output_root,
+        )
+        for tier in selected
+    ]
     manifest = {
-        "schemaVersion": 1,
-        "packVersion": PACK_VERSION,
-        "releaseTag": f"v{PACK_VERSION}",
+        "schemaVersion": 2,
+        "packVersion": recipe["packVersion"],
+        "releaseTag": f"v{recipe['packVersion']}",
+        "recipe": {
+            "name": recipe["name"],
+            "file": recipe_path.name,
+            "sha256": sha256(recipe_path),
+        },
         "upstream": {
             "project": "PaddleOCR",
             "modelFamily": SOURCE_LOCK["modelFamily"],
             "license": SOURCE_LOCK["license"],
         },
         "conversion": {
-            "minimumDeploymentTarget": "iOS 17",
-            "computePrecision": "FLOAT16",
-            "inputOutputType": "FLOAT32",
+            "minimumDeploymentTarget": recipe["minimumDeploymentTarget"],
+            "computeUnits": recipe["computeUnits"],
             "archiveFormat": "AppleArchive",
             "compression": "lzfse",
         },
-        # 三档共用同一套前后处理超参，app 侧只有模型文件不同。
-        "detector": {"inputWidth": DET_SIZE, "inputHeight": DET_SIZE,
-                     "mean": DET_MEAN, "std": DET_STD,
-                     "conversionTolerance": DET_TOLERANCE},
-        "recognizer": {"inputWidth": REC_WIDTH, "inputHeight": REC_HEIGHT,
-                       "mean": REC_MEAN, "std": REC_STD,
-                       "conversionTolerance": REC_TOLERANCE},
         "packs": packs,
     }
-    (out_root / "manifest.json").write_text(
-        json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    (out_root / "SHA256SUMS").write_text(
-        "".join(f"{p['archive']['sha256']}  {p['archive']['name']}\n" for p in packs),
+    (output_root / "manifest.json").write_text(
+        json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+    )
+    (output_root / "SHA256SUMS").write_text(
+        "".join(f"{pack['archive']['sha256']}  {pack['archive']['name']}\n" for pack in packs),
         encoding="utf-8",
     )
 
-    print("\n完成：")
-    for p in packs:
-        print(f"  {p['tier']:<7} {p['archive']['bytes']/1048576:6.1f} MB  "
-              f"上游识别 W-Avg {p['upstreamOfficialRecognitionWAvg']}  "
-              f"sha256 {p['archive']['sha256'][:16]}…")
+    for pack in packs:
+        print(
+            f"{pack['tier']:<7} {pack['archive']['bytes'] / 1048576:6.1f} MB  "
+            f"sha256 {pack['archive']['sha256'][:16]}..."
+        )
 
 
 if __name__ == "__main__":

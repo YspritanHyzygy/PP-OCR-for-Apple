@@ -30,16 +30,21 @@ The build is pinned to Python 3.12, a committed `uv.lock`, and exact upstream Hu
 
 ```bash
 uv sync --locked --python 3.12
-uv run python scripts/build_models.py --out dist
-python3 scripts/check_project.py --manifest dist/manifest.json
+uv run python scripts/build_models.py \
+  --recipe recipes/v2-corrected-reference.json \
+  --out dist
+python3 scripts/check_project.py \
+  --recipe recipes/v2-corrected-reference.json \
+  --manifest dist/manifest.json
 ```
 
-The build downloads the pinned official ONNX exports, validates the graph rewrite and Core ML conversion, then writes the three archives, `manifest.json`, and `SHA256SUMS`.
+The build downloads the pinned official ONNX exports, folds their BGR input contract into an Apple-facing RGB first convolution, validates graph rewrites and Core ML conversion, then writes the three archives, `manifest.json`, and `SHA256SUMS`. A recipe selects source components, fixed shapes, boundary types, and supported weight compression without creating another conversion implementation.
 
 ## Documentation
 
 - [`MODEL_CARD.md`](MODEL_CARD.md) — provenance, intended use, coverage, and limitations
 - [`BENCHMARKS.md`](BENCHMARKS.md) — measurement rules and versioned reports
+- [`docs/v1-optimization-analysis.md`](docs/v1-optimization-analysis.md) — measured v1 structure, correctness gaps, and optimization evidence
 - [`manifests/`](manifests) — immutable metadata for published releases
 
 ## License
