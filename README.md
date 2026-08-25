@@ -45,6 +45,7 @@ The build downloads the pinned official ONNX exports, folds their BGR input cont
 - [`MODEL_CARD.md`](MODEL_CARD.md) — provenance, intended use, coverage, and limitations
 - [`BENCHMARKS.md`](BENCHMARKS.md) — measurement rules and versioned reports
 - [`docs/v1-optimization-analysis.md`](docs/v1-optimization-analysis.md) — measured v1 structure, correctness gaps, and optimization evidence
+- [`docs/apple-neural-engine-compatibility.md`](docs/apple-neural-engine-compatibility.md) — ANE placement, physical-device protocol, and current `.all` decision
 - [`manifests/`](manifests) — immutable metadata for published releases
 
 ## License

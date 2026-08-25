@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "kind": "apple-neural-engine-compatibility-status",
+  "releaseTag": "v2",
+  "status": "pendingPhysicalEvidence",
+  "productionComputeUnits": "all",
+  "deviceMatrix": [
+    {
+      "hardwareGroup": "A12-A13",
+      "representative": "iPhone XS",
+      "evidenceStatus": "notRecorded"
+    },
+    {
+      "hardwareGroup": "A14-A16",
+      "representative": "iPhone 14 Pro or iPhone 15",
+      "evidenceStatus": "notRecorded"
+    },
+    {
+      "hardwareGroup": "A17Pro-A19",
+      "representative": "iPhone 16 Pro",
+      "evidenceStatus": "notRecorded"
+    }
+  ],
+  "candidates": [
+    "B1",
+    "small-rec320",
+    "small-rec320-w8a8"
+  ],
+  "candidateStatus": {
+    "B1": "awaitingPhysicalEvidence",
+    "small-rec320": "awaitingPhysicalEvidence",
+    "small-rec320-w8a8": "builderAndRecognizerSmokeOnly"
+  },
+  "currentDecision": {
+    "userFacingNpuSwitch": false,
+    "chipModelAllowlist": false,
+    "hardwareSpecificPackages": false,
+    "reason": "No complete same-device A12, A16, and A18 Pro comparison exists."
+  },
+  "releaseBlocked": true
+}

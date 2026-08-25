@@ -3,10 +3,30 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from scripts.run_verto_benchmark import inject_environment
+from scripts.run_verto_benchmark import (
+    build_xctestruns,
+    configured_xctestrun,
+    inject_environment,
+)
 
 
 class XCTestrunEnvironmentTests(unittest.TestCase):
+    def test_configured_copy_stays_beside_and_is_not_a_build_product(self):
+        with tempfile.TemporaryDirectory() as directory:
+            products = Path(directory)
+            built = products / "Verto_iphoneos.xctestrun"
+            built.touch()
+            configured = configured_xctestrun(
+                products, "small", "small/rec320", "cpuAndNeuralEngine"
+            )
+            configured.touch()
+            self.assertEqual(configured.parent, products)
+            self.assertEqual(
+                configured.name,
+                "Configured-Verto_small_small-rec320_cpuAndNeuralEngine.xctestrun",
+            )
+            self.assertEqual(build_xctestruns(products), [built])
+
     def test_injects_only_the_unit_test_environment(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
