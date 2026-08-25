@@ -16,13 +16,16 @@ The current packages are used by [Verto](https://github.com/YspritanHyzygy/Verto
 
 ## Conversion
 
-The official ONNX graphs are converted without retraining:
+The official ONNX graphs are converted without retraining. The v2 corrected-reference recipe:
 
-1. Rewrite unsupported `SAME_UPPER` nodes to explicit padding and require bit-identical ONNX output.
-2. Trace the fixed detector and recognizer input shapes.
-3. Convert weights and compute to Float16 while keeping model inputs and outputs Float32.
-4. Compare Core ML output with the official ONNX output using deterministic inputs. Detection and recognition use explicit error bounds; recognition also reports CTC argmax differences as a diagnostic. End-to-end OCR probes, not random tensors, decide whether decoded text remains usable.
-5. Package the two `.mlpackage` directories and the unmodified character set as an LZFSE-compressed Apple Archive.
+1. Folds the upstream BGR-to-Apple-RGB channel permutation into each model's first convolution, reorders detector normalization constants, and proves the folded RGB ONNX graph is equivalent to the official BGR graph on colored input.
+2. Rewrites unsupported `SAME_UPPER` nodes to explicit padding and requires bit-identical ONNX output.
+3. Traces the recipe's fixed detector and recognizer input shapes.
+4. Converts weights and compute to Float16 while keeping model inputs and outputs Float32 unless an evaluated recipe explicitly changes one variable.
+5. Compares Core ML output with the official ONNX output using deterministic inputs. Detection and recognition use explicit error bounds; recognition also reports CTC argmax differences as a diagnostic. End-to-end OCR probes, not random tensors, decide whether decoded text remains usable.
+6. Packages the two `.mlpackage` directories and the unmodified character set as an LZFSE-compressed Apple Archive.
+
+`B0` means the immutable published v1 bytes plus Verto v1 behavior. `B1` means the Float16 corrected-reference recipe above. Optimization candidates are compared with B1, so a correctness repair is not mislabeled as a compression or speed gain.
 
 ## Language and script limitations
 

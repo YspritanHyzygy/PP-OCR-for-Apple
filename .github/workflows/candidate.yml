@@ -1,0 +1,50 @@
+name: Build model candidate
+
+on:
+  workflow_dispatch:
+    inputs:
+      recipe:
+        description: Committed candidate recipe
+        required: true
+        default: "recipes/v2-corrected-reference.json"
+      tier:
+        description: Tier to build
+        required: true
+        type: choice
+        options:
+          - tiny
+          - small
+          - medium
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+      - name: Install locked conversion environment
+        run: uv sync --locked --python 3.12
+      - name: Validate candidate recipe
+        run: python3 scripts/check_project.py --recipe "${{ inputs.recipe }}"
+      - name: Build candidate
+        run: >-
+          uv run python scripts/build_models.py
+          --recipe "${{ inputs.recipe }}"
+          --tier "${{ inputs.tier }}"
+          --out dist
+      - name: Validate candidate metadata and assets
+        run: >-
+          python3 scripts/check_project.py
+          --recipe "${{ inputs.recipe }}"
+          --manifest dist/manifest.json
+          --assets dist
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pp-ocr-v2-${{ inputs.tier }}-candidate
+          path: |
+            dist/*.aar
+            dist/manifest.json
+            dist/SHA256SUMS
+          if-no-files-found: error

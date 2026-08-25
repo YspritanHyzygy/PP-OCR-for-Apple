@@ -1,0 +1,72 @@
+{
+  "schemaVersion": 1,
+  "status": "blocked",
+  "supportedLanguages": ["en", "zh-Hans", "ja", "fr", "es", "de"],
+  "publicDatasets": [
+    {
+      "id": "icdar2015-challenge4-test",
+      "split": "test",
+      "source": "https://rrc.cvc.uab.es/?ch=4&com=downloads",
+      "license": "ICDAR Robust Reading Competition terms",
+      "archiveSHA256": null,
+      "availability": "manual-authentication-required"
+    },
+    {
+      "id": "total-text-test",
+      "split": "test",
+      "source": "https://paddleocr.bj.bcebos.com/dataset/total_text.tar",
+      "license": "BSD-3-Clause",
+      "terms": "https://github.com/cs-chan/Total-Text-Dataset/blob/master/LICENSE",
+      "archiveSHA256": "38b24c3701d140e3a579a1e0bafe4dbfacd24672e8fc6232fb09bf1ee57a66d7",
+      "availability": "public-download"
+    },
+    {
+      "id": "ctw1500-test",
+      "split": "test",
+      "source": "https://paddleocr.bj.bcebos.com/dataset/ctw1500.zip",
+      "license": "free to the academic community for research only; do not redistribute",
+      "terms": "https://github.com/Yuliang-Liu/Curve-Text-Detector#readme",
+      "archiveSHA256": "4095e612e951c0d9584bc3ecc036b59554820d5a6056f84283511148a5b81c15",
+      "availability": "public-download"
+    },
+    {
+      "id": "icdar2019-mlt",
+      "split": "train-stratified-evaluation-subset",
+      "source": "https://rrc.cvc.uab.es/?ch=15&com=downloads",
+      "license": "ICDAR Robust Reading Competition terms",
+      "archiveSHA256": null,
+      "availability": "manual-authentication-required"
+    }
+  ],
+  "generatedCorpus": {
+    "id": "latin-diacritic-v1",
+    "seed": 20260824,
+    "languages": ["fr", "es", "de"],
+    "samplesPerLanguage": 60,
+    "purpose": "reproducible recognizer and color-order regression coverage",
+    "font": {
+      "name": "Noto Sans Regular",
+      "license": "SIL Open Font License 1.1",
+      "source": "https://raw.githubusercontent.com/notofonts/noto-fonts/ffebf8c1ee449e544955a7e813c54f9b73848eac/hinted/ttf/NotoSans/NotoSans-Regular.ttf",
+      "sha256": "b85c38ecea8a7cfb39c24e395a4007474fa5a4fc864f6ee33309eb4948d232d5"
+    }
+  },
+  "privateFinalHoldout": {
+    "images": 36,
+    "imagesPerLanguage": 6,
+    "scenarios": [
+      "document-or-menu",
+      "storefront-or-sign",
+      "screen-or-ui",
+      "small-or-distant-text",
+      "rotated-or-curved-text",
+      "low-light-or-glare"
+    ],
+    "committed": false,
+    "use": "finalists-only"
+  },
+  "blockers": [
+    "Official ICDAR archives requiring authentication have not been supplied.",
+    "The private 36-photo final holdout has not been supplied."
+  ]
+}
