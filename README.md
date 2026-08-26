@@ -1,6 +1,6 @@
 # PP-OCR for Apple
 
-Unofficial PP-OCR model packages for Core ML on Apple platforms, with a reproducible conversion pipeline and measured release metadata.
+Unofficial PP-OCR model packages for Core ML on Apple platforms, with a reproducible conversion pipeline and measured release metadata. The repository also contains an independently gated MI-GAN 512 Core ML candidate for still-photo background reconstruction.
 
 This project is not affiliated with or endorsed by PaddlePaddle or Apple. The model architecture and upstream ONNX exports come from [PaddlePaddle's PP-OCRv6 collection](https://huggingface.co/collections/PaddlePaddle/pp-ocrv6). Verto uses these packages for its optional high-accuracy, on-device camera OCR path.
 
@@ -47,7 +47,16 @@ The build downloads the pinned official ONNX exports, folds their BGR input cont
 - [`docs/v1-optimization-analysis.md`](docs/v1-optimization-analysis.md) — measured v1 structure, correctness gaps, and optimization evidence
 - [`docs/apple-neural-engine-compatibility.md`](docs/apple-neural-engine-compatibility.md) — ANE placement, physical-device protocol, and current `.all` decision
 - [`manifests/`](manifests) — immutable metadata for published releases
+- [`migan/MODEL_CARD.md`](migan/MODEL_CARD.md): MI-GAN tensor contract, intended use, and redistribution gate
+- [`migan/BENCHMARKS.md`](migan/BENCHMARKS.md): physical-device and Core ML Instruments evidence requirements
+- [`benchmarks/migan-device-matrix-v1.json`](benchmarks/migan-device-matrix-v1.json): fixed-fixture results from iPhone 16 Pro, iPhone 12, and iPhone XR
+
+## MI-GAN candidate
+
+The MI-GAN conversion uses its own source lock, builder, validator, benchmark contract, and `migan-v1` release workflow. The PP-OCR recipes, assets, tags, and `latest` release behavior stay unchanged.
+
+The official source code is MIT licensed and the pinned README links the pretrained checkpoint folder. Both primary sources are preserved under [`migan/`](migan). The checkpoint and converted-derivative redistribution scopes remain unconfirmed, so `scripts/check_migan.py --require-release-ready` continues to block artifact publication. Local conversion can be reproduced with the exact checkpoint URL, byte length, SHA-256, and upstream commit in [`migan/sources.lock.json`](migan/sources.lock.json).
 
 ## License
 
-The conversion code and redistributed model derivatives are available under Apache License 2.0. See [`NOTICE`](NOTICE) for upstream attribution. PP-OCR and PaddlePaddle names belong to their respective owners; Apple and Core ML are trademarks of Apple Inc.
+The conversion code and redistributed PP-OCR model derivatives are available under Apache License 2.0. MI-GAN source attribution and its separate checkpoint gate are documented in [`migan/NOTICE`](migan/NOTICE). See [`NOTICE`](NOTICE) for PP-OCR attribution. PP-OCR and PaddlePaddle names belong to their respective owners; Apple and Core ML are trademarks of Apple Inc.

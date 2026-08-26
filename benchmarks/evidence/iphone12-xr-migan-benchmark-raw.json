@@ -1,0 +1,345 @@
+{
+  "schemaVersion": 2,
+  "createdAt": "2026-08-25T22:08:00-04:00",
+  "model": {
+    "name": "MIGAN512Places2",
+    "treeSHA256": "fd5b5acc004954e178e523eb438c421495708a369bb2a4d56b5438b89f249c4e",
+    "input": {
+      "image": "Float16 [1,3,512,512]",
+      "mask": "Float16 [1,1,512,512]"
+    },
+    "output": "Float32 [1,3,512,512]"
+  },
+  "protocol": {
+    "performance": "one warmup followed by three measured predictions per compute-unit mode",
+    "freshComparison": "CPU+GPU and all launched in separate app processes, CPU+GPU first",
+    "parity": "one warmup per mode followed by full-tensor comparison against CPU+GPU; inpaint rectangle x=144..<368, y=176..<336",
+    "thermalNote": "iPhone 12 was nominal; iPhone XR was fair"
+  },
+  "harness": {
+    "sourceSHA256": "dcb16a16921f6d6f58524a04509a6f73914205c06430a8afa59f895272871833",
+    "parityAppBinarySHA256": "3660175d001715be95ef2ac78db089a567bcf418ff852a8cd10049b226bc8a35",
+    "bundleIdentifier": "com.yspritan.miganbench"
+  },
+  "devices": [
+    {
+      "name": "iPhone 12",
+      "productType": "iPhone13,2",
+      "chip": "A14",
+      "os": "18.4 (22E5232a)",
+      "matrix": [
+        {
+          "name": "all",
+          "coldLoadMilliseconds": 1572.963458,
+          "predictionMilliseconds": [
+            61.8115,
+            63.016958,
+            65.64625
+          ],
+          "medianPredictionMilliseconds": 63.016958,
+          "observedResidentHighWaterBytes": 63815680,
+          "thermalState": "nominal",
+          "outputSamples": [
+            0.052490234,
+            0.034179688,
+            0.26220703
+          ]
+        },
+        {
+          "name": "cpuAndNeuralEngine",
+          "coldLoadMilliseconds": 1222.23975,
+          "predictionMilliseconds": [
+            62.599791,
+            62.903792,
+            62.733625
+          ],
+          "medianPredictionMilliseconds": 62.733625,
+          "observedResidentHighWaterBytes": 63488000,
+          "thermalState": "nominal",
+          "outputSamples": [
+            0.052490234,
+            0.034179688,
+            0.26220703
+          ]
+        },
+        {
+          "name": "cpuAndGPU",
+          "coldLoadMilliseconds": 234.930917,
+          "predictionMilliseconds": [
+            106.950167,
+            97.016042,
+            100.568458
+          ],
+          "medianPredictionMilliseconds": 100.568458,
+          "observedResidentHighWaterBytes": 71778304,
+          "thermalState": "nominal",
+          "outputSamples": [
+            0.052749634,
+            0.03427887,
+            0.262146
+          ]
+        },
+        {
+          "name": "cpuOnly",
+          "coldLoadMilliseconds": 210.683375,
+          "predictionMilliseconds": [
+            223.255167,
+            222.862959,
+            223.218542
+          ],
+          "medianPredictionMilliseconds": 223.218542,
+          "observedResidentHighWaterBytes": 216530944,
+          "thermalState": "nominal",
+          "outputSamples": [
+            0.052734375,
+            0.03466797,
+            0.2626953
+          ]
+        }
+      ],
+      "freshProcess": {
+        "cpuAndGPU": {
+          "coldLoadMilliseconds": 48.2315,
+          "predictionMilliseconds": [
+            103.994333,
+            108.203625,
+            103.805875
+          ],
+          "medianPredictionMilliseconds": 103.994333,
+          "observedResidentHighWaterBytes": 67747840,
+          "thermalState": "nominal"
+        },
+        "all": {
+          "coldLoadMilliseconds": 75.665416,
+          "predictionMilliseconds": [
+            67.857708,
+            68.501916,
+            68.966083
+          ],
+          "medianPredictionMilliseconds": 68.501916,
+          "observedResidentHighWaterBytes": 43646976,
+          "thermalState": "nominal"
+        }
+      },
+      "parity": {
+        "reference": "cpuAndGPU",
+        "allVsCPUAndGPU": {
+          "fullOutput": {
+            "sampleCount": 786432,
+            "nonFiniteCount": 0,
+            "meanAbsoluteError": 0.0002236597655382866,
+            "rootMeanSquareError": 0.0003143680921898732,
+            "maxAbsoluteError": 0.01140594482421875,
+            "fractionAboveOneHundredth": 0.000008900960286458334,
+            "fractionAboveFiveHundredths": 0
+          },
+          "inpaintRegion": {
+            "sampleCount": 107520,
+            "nonFiniteCount": 0,
+            "meanAbsoluteError": 0.00030129521841272,
+            "rootMeanSquareError": 0.0004980239255081277,
+            "maxAbsoluteError": 0.01140594482421875,
+            "fractionAboveOneHundredth": 0.00006510416666666667,
+            "fractionAboveFiveHundredths": 0
+          }
+        },
+        "cpuOnlyVsCPUAndGPU": {
+          "inpaintRegion": {
+            "sampleCount": 107520,
+            "nonFiniteCount": 0,
+            "meanAbsoluteError": 0.0014012226302708899,
+            "rootMeanSquareError": 0.0029424205660121884,
+            "maxAbsoluteError": 0.08016443252563477,
+            "fractionAboveOneHundredth": 0.010658482142857143,
+            "fractionAboveFiveHundredths": 0.0004464285714285714
+          }
+        }
+      },
+      "instruments": {
+        "status": "completed",
+        "trace": "iphone12-migan-coreml.trace",
+        "target": "iPhone 12, iOS 18.4 (22E5232a)",
+        "benchmarkProcess": "Verto pid 1054",
+        "aneRows": 102,
+        "aneModelLoadLabel": "MIGAN512Places2_main__Op0_AneInference Load: cached",
+        "neuralEnginePredictionRows": 101,
+        "gpuRowsAttributedToBenchmarkProcess": 0
+      }
+    },
+    {
+      "name": "iPhone XR",
+      "productType": "iPhone11,8",
+      "chip": "A12",
+      "os": "18.5 (22F76)",
+      "matrix": [
+        {
+          "name": "all",
+          "coldLoadMilliseconds": 2183.809375,
+          "predictionMilliseconds": [
+            117.649791,
+            119.189458,
+            119.84
+          ],
+          "medianPredictionMilliseconds": 119.189458,
+          "observedResidentHighWaterBytes": 58359808,
+          "thermalState": "fair",
+          "outputSamples": [
+            0.05859375,
+            0.061157227,
+            0.26464844
+          ]
+        },
+        {
+          "name": "cpuAndNeuralEngine",
+          "coldLoadMilliseconds": 1739.59025,
+          "predictionMilliseconds": [
+            115.822958,
+            114.792584,
+            113.523542
+          ],
+          "medianPredictionMilliseconds": 114.792584,
+          "observedResidentHighWaterBytes": 78249984,
+          "thermalState": "fair",
+          "outputSamples": [
+            0.05859375,
+            0.061157227,
+            0.26464844
+          ]
+        },
+        {
+          "name": "cpuAndGPU",
+          "coldLoadMilliseconds": 494.379,
+          "predictionMilliseconds": [
+            153.268167,
+            167.670084,
+            156.779666
+          ],
+          "medianPredictionMilliseconds": 156.779666,
+          "observedResidentHighWaterBytes": 105119744,
+          "thermalState": "fair",
+          "outputSamples": [
+            0.052993774,
+            0.034217834,
+            0.26233673
+          ]
+        },
+        {
+          "name": "cpuOnly",
+          "coldLoadMilliseconds": 291.953041,
+          "predictionMilliseconds": [
+            448.815875,
+            457.150208,
+            448.598
+          ],
+          "medianPredictionMilliseconds": 448.815875,
+          "observedResidentHighWaterBytes": 232374272,
+          "thermalState": "fair",
+          "outputSamples": [
+            0.052246094,
+            0.03564453,
+            0.2631836
+          ]
+        }
+      ],
+      "freshProcess": {
+        "cpuAndGPU": {
+          "coldLoadMilliseconds": 164.011667,
+          "predictionMilliseconds": [
+            159.001667,
+            160.040041,
+            155.546458
+          ],
+          "medianPredictionMilliseconds": 159.001667,
+          "observedResidentHighWaterBytes": 99631104,
+          "thermalState": "fair"
+        },
+        "all": {
+          "coldLoadMilliseconds": 376.148041,
+          "predictionMilliseconds": [
+            119.15025,
+            118.527958,
+            119.728875
+          ],
+          "medianPredictionMilliseconds": 119.15025,
+          "observedResidentHighWaterBytes": 58490880,
+          "thermalState": "fair"
+        }
+      },
+      "parity": {
+        "reference": "cpuAndGPU",
+        "allVsCPUAndGPU": {
+          "fullOutput": {
+            "sampleCount": 786432,
+            "nonFiniteCount": 0,
+            "meanAbsoluteError": 0.06999484527890824,
+            "rootMeanSquareError": 0.1228111665829142,
+            "maxAbsoluteError": 0.9761962890625,
+            "fractionAboveOneHundredth": 0.8478202819824219,
+            "fractionAboveFiveHundredths": 0.4377250671386719
+          },
+          "inpaintRegion": {
+            "sampleCount": 107520,
+            "nonFiniteCount": 0,
+            "meanAbsoluteError": 0.22166915284192545,
+            "rootMeanSquareError": 0.29625525973655065,
+            "maxAbsoluteError": 0.9761962890625,
+            "fractionAboveOneHundredth": 0.9612444196428571,
+            "fractionAboveFiveHundredths": 0.8142113095238095
+          }
+        },
+        "cpuOnlyVsCPUAndGPU": {
+          "inpaintRegion": {
+            "sampleCount": 107520,
+            "nonFiniteCount": 0,
+            "meanAbsoluteError": 0.0014033440317559455,
+            "rootMeanSquareError": 0.0029873169039880045,
+            "maxAbsoluteError": 0.07479095458984375,
+            "fractionAboveOneHundredth": 0.010323660714285714,
+            "fractionAboveFiveHundredths": 0.0005022321428571428
+          }
+        }
+      },
+      "instruments": {
+        "status": "raw-capture-present-but-unfinalized",
+        "trace": "iphonexr-migan-coreml.trace",
+        "rawTraceDataBytes": 235982304,
+        "rawTraceDataSHA256": "742dec5e86e291c5e72a00f653292122b488f7b2214b27d1bc05f583d48c1a64",
+        "modelNameStringObserved": "MIGAN512Places2",
+        "exportError": "Document Missing Template Error",
+        "note": "xctrace stopped collecting at its 50 second limit, then hung in save finalization for more than seven minutes and was terminated by exact PID"
+      }
+    },
+    {
+      "name": "iPhone 16 Pro",
+      "productType": "iPhone17,1",
+      "chip": "A18 Pro",
+      "os": "27.0 (24A5424a)",
+      "parityOnlyThisRun": {
+        "reference": "cpuAndGPU",
+        "allVsCPUAndGPU": {
+          "inpaintRegion": {
+            "sampleCount": 107520,
+            "nonFiniteCount": 0,
+            "meanAbsoluteError": 0.00035917753453499506,
+            "rootMeanSquareError": 0.0005707193120283966,
+            "maxAbsoluteError": 0.013477325439453125,
+            "fractionAboveOneHundredth": 0.00011160714285714285,
+            "fractionAboveFiveHundredths": 0
+          }
+        },
+        "cpuOnlyVsCPUAndGPU": {
+          "inpaintRegion": {
+            "sampleCount": 107520,
+            "nonFiniteCount": 0,
+            "meanAbsoluteError": 0.001312799520036649,
+            "rootMeanSquareError": 0.0024124422861439222,
+            "maxAbsoluteError": 0.059995055198669434,
+            "fractionAboveOneHundredth": 0.007273065476190476,
+            "fractionAboveFiveHundredths": 0.00021391369047619048
+          }
+        }
+      },
+      "performanceReference": "iphone16pro-migan-benchmark-fresh.json"
+    }
+  ]
+}

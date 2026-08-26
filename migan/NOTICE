@@ -1,0 +1,14 @@
+MI-GAN 512 Core ML candidate
+
+The conversion tooling in this repository is distributed under the Apache
+License, Version 2.0.
+
+MI-GAN source code is Copyright (c) 2024 Picsart AI Research (PAIR) and is
+available under the MIT License at:
+
+    https://github.com/Picsart-AI-Research/MI-GAN
+
+Redistribution terms for the separately hosted pretrained checkpoint remain
+unverified. The pinned MIT license and official checkpoint source are archived
+in `migan/licenses/PAIR-MIT-WEIGHTS-EVIDENCE.md`; publication remains blocked
+until primary evidence explicitly covers the checkpoint and converted model.
