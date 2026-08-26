@@ -49,7 +49,8 @@
         "thermalEvidence": "invalidForProduction; measurements reached serious",
         "runtimeObservations": [
           "MLE5 profiling cost was unavailable",
-          "Core ML reported resize layers that could not map on this architecture"
+          "Core ML reported resize layers that could not map on this architecture",
+          "A reverse-order retry after about 13 idle minutes still started and ended at serious thermal state, so its unmatched companion run was not started"
         ]
       },
       {
