@@ -244,6 +244,7 @@ def validate_ane_compatibility_status(report: dict[str, Any], require_ready: boo
     if any(item["evidenceStatus"] == "localPhysicalSmokeOnly" for item in matrix):
         smoke = report["smokeEvidence"]
         assert smoke["scope"].startswith("performance smoke only")
+        assert (ROOT / smoke["assessment"]).is_file()
         assert smoke["warmupRuns"] == 3
         assert smoke["measurementRunsPerPair"] == 30
         assert smoke["energy"] == "notMeasured"

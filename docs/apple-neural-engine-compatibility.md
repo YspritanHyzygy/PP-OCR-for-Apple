@@ -34,7 +34,7 @@ Forcing CPU plus Neural Engine changed warm end-to-end p50 by -2.1% to +3.9% acr
 
 `small-rec320` is less Neural-Engine-friendly than its B1 small parent on this OS build: its recognizer preferred the Neural Engine for only 74.8% of known cost, with three convolution operations preferring the CPU. Detector plus recognizer inference represented only 6.9%-18.9% of end-to-end time across the tested `all` runs, below the 40% stop gate. The current performance focus therefore moves to CPU preprocessing and post-processing rather than forcing more Neural Engine placement.
 
-This is a performance-path smoke, not a final benchmark. It uses one generated sample, records no energy measurement, does not replace the public quality corpus or private holdout, and does not prove stable-iOS or older-chip performance. The exact machine-readable boundary is maintained in [`benchmarks/ane-compatibility-v2.json`](../benchmarks/ane-compatibility-v2.json).
+This is a performance-path smoke, not a final benchmark. It uses one generated sample, records no energy measurement, does not replace the public quality corpus or private holdout, and does not prove stable-iOS or older-chip performance. The measured summaries and paired decisions are preserved in [`benchmarks/ane-iphone16-pro-smoke.json`](../benchmarks/ane-iphone16-pro-smoke.json); the release boundary remains in [`benchmarks/ane-compatibility-v2.json`](../benchmarks/ane-compatibility-v2.json).
 
 ## What Verto records
 

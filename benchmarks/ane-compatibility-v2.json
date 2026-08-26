@@ -39,6 +39,7 @@
   },
   "smokeEvidence": {
     "scope": "performance smoke only; one reproducible generated French sample",
+    "assessment": "benchmarks/ane-iphone16-pro-smoke.json",
     "device": "iPhone 16 Pro",
     "hardwareIdentifier": "iPhone17,1",
     "operatingSystem": "iOS 27.0 beta (24A5424a)",
