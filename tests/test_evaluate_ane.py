@@ -147,6 +147,26 @@ class ANEAssessmentTests(unittest.TestCase):
         self.assertFalse(comparison["eligibleForProduction"])
         self.assertEqual(result["productionComputeUnitsDecision"]["decision"], "keepAll")
 
+    def test_serious_thermal_evidence_cannot_cover_a_hardware_group(self):
+        before = make_report("A12-A13", "all", 100.0)
+        after = make_report("A12-A13", "cpuAndNeuralEngine", 80.0)
+        for report in (before, after):
+            report["run"]["thermalStateStart"] = "serious"
+            report["run"]["thermalStateEnd"] = "serious"
+            measurement = report["samples"][0]["measurements"][0]
+            measurement["thermalStateBefore"] = "serious"
+            measurement["thermalStateAfter"] = "serious"
+
+        result = assess([before, after], {})
+
+        comparison = result["pairedComputeUnitComparisons"][0]
+        self.assertFalse(comparison["thermalEvidenceValid"])
+        self.assertFalse(comparison["eligibleForProduction"])
+        self.assertEqual(
+            result["productionComputeUnitsDecision"]["missingHardwareGroups"],
+            ["A12-A13", "A14-A16", "A17Pro-A19"],
+        )
+
     def test_core_ml_below_forty_percent_redirects_optimization(self):
         result = assess([make_report()], {})
         performance = result["reports"][0]["performance"]

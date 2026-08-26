@@ -2,7 +2,7 @@
 
 ## Current decision
 
-Verto continues to load every production OCR model with `MLComputeUnits.all`. There is no user-facing NPU switch, chip allowlist, or hardware-specific download package. Core ML can already schedule supported operations across the Neural Engine, GPU, and CPU. An iPhone 16 Pro physical-device smoke has now rejected a production switch to `cpuAndNeuralEngine` for every tested tier and candidate; A12-A13 and A14-A16 pairs are still required before the hardware matrix is complete.
+Verto continues to load every production OCR model with `MLComputeUnits.all`. There is no user-facing NPU switch, chip allowlist, or hardware-specific download package. Core ML can already schedule supported operations across the Neural Engine, GPU, and CPU. Thermally valid iPhone 12 and iPhone 16 Pro pairs found no qualifying benefit from `cpuAndNeuralEngine`; iPhone XR runs reached serious thermal state and remain smoke-only. Nothing in the recorded evidence supports overriding Core ML's default scheduler.
 
 Every iPhone that can run Verto's minimum iOS 17 target has an Apple Neural Engine. The compatibility question is therefore not whether an NPU exists, but whether each Core ML operation is placed there and whether forcing CPU plus Neural Engine improves the complete OCR pipeline. Apple exposes compute-unit policy, not individual Neural Engine core selection.
 
@@ -26,15 +26,19 @@ Primary references:
 
 Simulator and Apple-silicon Mac results can prove compilation and functional correctness only. They are never labelled as iPhone Neural Engine performance evidence.
 
-### Recorded iPhone 16 Pro smoke
+### Recorded physical-device smoke
 
-The current local physical smoke used an iPhone 16 Pro (`iPhone17,1`) on iOS 27.0 beta build `24A5424a`, one reproducible generated French image, three warm-ups, and 30 measurements per compute-unit policy. It ran B1 tiny, small, and medium plus `small-rec320`, pairing `all` with `cpuAndNeuralEngine` on the same phone.
+The current local physical smoke used one reproducible generated French image, three warm-ups, and 30 measurements per compute-unit policy. Each candidate paired `all` with `cpuAndNeuralEngine` on the same phone. This covered an iPhone XR (`iPhone11,8`) on iOS 18.5, iPhone 12 (`iPhone13,2`) on iOS 18.4, and iPhone 16 Pro (`iPhone17,1`) on iOS 27.0 beta.
 
-Forcing CPU plus Neural Engine changed warm end-to-end p50 by -2.1% to +3.9% across those four pairs. None reached the required 15% improvement, all OCR outputs stayed identical, and no measured latency or memory dimension crossed the 10% regression limit. B1 detector plans preferred the Neural Engine for 95.4%-96.1% of known cost; B1 recognizers preferred it for 98.4%-100%. Each non-compliant component contained a cost-bearing `pad` operation unsupported by the Neural Engine.
+On iPhone 16 Pro, forcing CPU plus Neural Engine changed warm end-to-end p50 by -2.1% to +3.9% across B1 tiny, small, and medium plus `small-rec320`. None reached the required 15% improvement. B1 detector plans preferred the Neural Engine for 95.4%-96.1% of known cost; B1 recognizers preferred it for 98.4%-100%. Each non-compliant component contained a cost-bearing `pad` operation unsupported by the Neural Engine.
 
 `small-rec320` is less Neural-Engine-friendly than its B1 small parent on this OS build: its recognizer preferred the Neural Engine for only 74.8% of known cost, with three convolution operations preferring the CPU. Detector plus recognizer inference represented only 6.9%-18.9% of end-to-end time across the tested `all` runs, below the 40% stop gate. The current performance focus therefore moves to CPU preprocessing and post-processing rather than forcing more Neural Engine placement.
 
-This is a performance-path smoke, not a final benchmark. It uses one generated sample, records no energy measurement, does not replace the public quality corpus or private holdout, and does not prove stable-iOS or older-chip performance. The measured summaries and paired decisions are preserved in [`benchmarks/ane-iphone16-pro-smoke.json`](../benchmarks/ane-iphone16-pro-smoke.json); the release boundary remains in [`benchmarks/ane-compatibility-v2.json`](../benchmarks/ane-compatibility-v2.json).
+On iPhone 12, B1 small under CPU plus Neural Engine was 4.1% slower at p50 and 4.7% slower at p95. `small-rec320` was effectively unchanged, but the device logged `ANECCompile() FAILED (11)` for that candidate and Core ML completed inference through fallback. B1 small's estimated Neural Engine-preferred cost was 90.3% for the detector and 76.0% for the recognizer. Core ML inference represented about 4.0% of end-to-end time.
+
+On iPhone XR, B1 small under CPU plus Neural Engine appeared 45.6% slower at p50 and 40.2% slower at p95, but the baseline moved from fair to serious thermal state and the paired run remained serious. `small-rec320` also ran entirely at serious thermal state. Those timings are preserved but excluded from production decisions. The A12 MLE5 engine did not expose estimated profiling cost, and Core ML logged resize layers that could not map on the architecture.
+
+All paired OCR outputs stayed identical. This remains a performance-path smoke, not a final benchmark: it uses one generated sample, records no energy measurement, does not replace the public quality corpus or private holdout, and does not prove a stable result for the thermally invalid A12 pair. The measured summaries and paired decisions are preserved in [`benchmarks/ane-physical-device-smoke.json`](../benchmarks/ane-physical-device-smoke.json); the release boundary remains in [`benchmarks/ane-compatibility-v2.json`](../benchmarks/ane-compatibility-v2.json).
 
 ## What Verto records
 
@@ -57,7 +61,7 @@ See [`evaluation/ane-report-schema.md`](../evaluation/ane-report-schema.md) for 
 
 `scripts/evaluate_ane.py` owns the decisions; Verto never grades itself. For each detector and recognizer under `all`, the assessor requires at least 90% of known estimated cost to prefer the Neural Engine, no cost-bearing operation with missing device usage or no Neural Engine support, and a written explanation for every non-ANE operation representing at least 5% of cost. Unweighted bookkeeping and constants remain visible in the raw counts but do not pretend to consume runtime cost.
 
-A production change to `cpuAndNeuralEngine` remains ineligible until same-device pairs cover all three physical hardware groups. Each pair must preserve identical OCR output, improve warm end-to-end p50 or measured energy by at least 15%, and keep every measured latency, memory, and energy dimension within 10% of `all`.
+A production change to `cpuAndNeuralEngine` remains ineligible until same-device pairs cover all three physical hardware groups. Each pair must preserve identical OCR output, improve warm end-to-end p50 or measured energy by at least 15%, and keep every measured latency, memory, and energy dimension within 10% of `all`. Both runs must report the same thermal-state set, and only nominal or fair measurements may cover a production hardware group; serious or critical results stay visible as smoke evidence but cannot pass.
 
 If detector plus recognizer inference accounts for less than 40% of end-to-end time, the assessor redirects work to CPU preprocessing, DB post-processing, and CTC decoding. A hardware-specific package is outside v2 unless a later experiment shows at least 25% modern-device benefit and a stable public capability check exists.
 
@@ -75,7 +79,7 @@ uv run python scripts/build_models.py \
 
 ## Running a local pair
 
-Use one physical device, one candidate, the same public performance subset, three warm-ups, and 30 raw measurements. Run `all` and `cpuAndNeuralEngine` consecutively, changing only the compute-unit argument.
+Use one physical device, one candidate, the same public performance subset, three warm-ups, and 30 raw measurements. Run `all` and `cpuAndNeuralEngine` consecutively, changing only the compute-unit argument. Run only one physical-device XCTest session at a time: concurrent XR and iPhone 12 sessions both lost the XCTest driver before bootstrap with exit code 74, while the same bundles passed when rerun serially.
 
 ```bash
 uv run python scripts/run_verto_benchmark.py \
@@ -124,6 +128,6 @@ The private 36-photo holdout stays on the local iPhone 16 Pro and is run only fo
 
 ## Remaining physical-device boundary
 
-The available local representatives are an iPhone XR for A12-A13 and an iPhone 12 for the lower A14-A16 boundary. Each must run B1 small and `small-rec320` back-to-back under `all` and `cpuAndNeuralEngine`, with three warm-ups and 30 measurements. The iPhone 12 is an A14 device; it must not be described as A16 evidence even though it covers the same compatibility group.
+The iPhone 12 and iPhone 16 Pro smoke pairs are thermally valid and reject a production compute-unit override. The iPhone XR completed both B1 small and `small-rec320`, but serious thermal state prevents those runs from closing the A12-A13 production evidence gate. A cooled, thermally matched A12 pair remains required for a complete hardware matrix. The iPhone 12 is an A14 device and must not be described as A16 evidence even though it covers the same compatibility group.
 
-BrowserStack remains a fallback only if local older-device evidence cannot be completed. No cloud upload workflow is committed because v2 assets and the locked public corpus remain release-blocked, and no paid usage has been authorized. Until the two local pairs are recorded, the versioned report says that A12-A13 and A14-A16 performance is unverified and hardware-specific packaging remains forbidden.
+BrowserStack remains a fallback only if a thermally valid local A12 pair cannot be completed. No cloud upload workflow is committed because v2 assets and the locked public corpus remain release-blocked, and no paid usage has been authorized. Until the cooled A12 pair, energy evidence, and full quality gates are recorded, hardware-specific packaging remains forbidden.

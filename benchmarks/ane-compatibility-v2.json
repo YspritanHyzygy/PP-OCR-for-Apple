@@ -8,12 +8,12 @@
     {
       "hardwareGroup": "A12-A13",
       "representative": "iPhone XR",
-      "evidenceStatus": "notRecorded"
+      "evidenceStatus": "localPhysicalSmokeOnly"
     },
     {
       "hardwareGroup": "A14-A16",
       "representative": "iPhone 12",
-      "evidenceStatus": "notRecorded"
+      "evidenceStatus": "localPhysicalSmokeOnly"
     },
     {
       "hardwareGroup": "A17Pro-A19",
@@ -27,40 +27,67 @@
     "small-rec320-w8a8"
   ],
   "candidateStatus": {
-    "B1": "a17ProPhysicalSmokeOnly",
-    "small-rec320": "a17ProPhysicalSmokeOnly",
+    "B1": "threeHardwareGroupPhysicalSmokeOnly",
+    "small-rec320": "threeHardwareGroupPhysicalSmokeOnly",
     "small-rec320-w8a8": "builderAndRecognizerSmokeOnly"
   },
   "currentDecision": {
     "userFacingNpuSwitch": false,
     "chipModelAllowlist": false,
     "hardwareSpecificPackages": false,
-    "reason": "On an iPhone 16 Pro physical-device smoke subset, cpuAndNeuralEngine did not reach the 15% benefit gate for B1 tiny, small, medium, or small-rec320, and Core ML inference remained below the 40% end-to-end focus gate. A12-A13 and A14-A16 paired evidence is still missing."
+    "reason": "Thermally valid iPhone 12 and iPhone 16 Pro pairs found no 15% benefit from cpuAndNeuralEngine, while Core ML inference stayed below the 40% end-to-end focus gate. The iPhone XR runs reached serious thermal state and remain smoke-only rather than production evidence."
   },
   "smokeEvidence": {
     "scope": "performance smoke only; one reproducible generated French sample",
-    "assessment": "benchmarks/ane-iphone16-pro-smoke.json",
-    "device": "iPhone 16 Pro",
-    "hardwareIdentifier": "iPhone17,1",
-    "operatingSystem": "iOS 27.0 beta (24A5424a)",
+    "assessment": "benchmarks/ane-physical-device-smoke.json",
+    "devices": [
+      {
+        "device": "iPhone XR",
+        "hardwareIdentifier": "iPhone11,8",
+        "hardwareGroup": "A12-A13",
+        "operatingSystem": "iOS 18.5 (22F76)",
+        "thermalEvidence": "invalidForProduction; measurements reached serious",
+        "runtimeObservations": [
+          "MLE5 profiling cost was unavailable",
+          "Core ML reported resize layers that could not map on this architecture"
+        ]
+      },
+      {
+        "device": "iPhone 12",
+        "hardwareIdentifier": "iPhone13,2",
+        "hardwareGroup": "A14-A16",
+        "operatingSystem": "iOS 18.4 (22E5232a)",
+        "thermalEvidence": "valid; paired runs matched at nominal or fair",
+        "runtimeObservations": [
+          "small-rec320 ANE compilation failed with ANECCompile error 11 and Core ML fell back successfully"
+        ]
+      },
+      {
+        "device": "iPhone 16 Pro",
+        "hardwareIdentifier": "iPhone17,1",
+        "hardwareGroup": "A17Pro-A19",
+        "operatingSystem": "iOS 27.0 beta (24A5424a)",
+        "thermalEvidence": "valid; paired runs matched at nominal or fair",
+        "runtimeObservations": []
+      }
+    ],
     "warmupRuns": 3,
     "measurementRunsPerPair": 30,
     "computeUnitPairs": [
       "all",
       "cpuAndNeuralEngine"
     ],
-    "testedCandidates": [
-      "B1 tiny",
-      "B1 small",
-      "B1 medium",
-      "small-rec320"
+    "testedPairs": [
+      "iPhone XR: B1 small and small-rec320",
+      "iPhone 12: B1 small and small-rec320",
+      "iPhone 16 Pro: B1 tiny, small, medium, and small-rec320"
     ],
-    "cpuAndNeuralEngineEndToEndP50RelativeChangeRange": [
+    "thermallyValidCpuAndNeuralEngineEndToEndP50RelativeChangeRange": [
       -0.02131,
-      0.038563
+      0.041358
     ],
     "coreMLInferenceFractionRange": [
-      0.068542,
+      0.040308,
       0.189274
     ],
     "ocrOutputsIdentical": true,

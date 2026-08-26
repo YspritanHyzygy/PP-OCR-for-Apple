@@ -14,6 +14,7 @@ import numpy as np
 
 
 PHYSICAL_EVIDENCE = {"localPhysical", "remotePhysical"}
+COMPARABLE_THERMAL_STATES = {"nominal", "fair"}
 COMPUTE_UNITS = {"all", "cpuAndNeuralEngine", "cpuAndGPU", "cpuOnly"}
 CANDIDATE_KINDS = {"reference", "shape", "w8a8", "boundary", "unspecified"}
 REQUIRED_HARDWARE_GROUPS = {"A12-A13", "A14-A16", "A17Pro-A19"}
@@ -298,6 +299,13 @@ def paired_comparison(
     }
     physical = baseline["run"]["evidenceClass"] in PHYSICAL_EVIDENCE
     outputs_identical = prediction_signature(baseline) == prediction_signature(candidate)
+    baseline_thermal = set(before["thermalStates"])
+    candidate_thermal = set(after["thermalStates"])
+    thermal_evidence_valid = (
+        bool(baseline_thermal)
+        and baseline_thermal == candidate_thermal
+        and baseline_thermal <= COMPARABLE_THERMAL_STATES
+    )
     return {
         "candidate": baseline["run"].get("candidate"),
         "tier": baseline["run"].get("tier"),
@@ -311,7 +319,16 @@ def paired_comparison(
         "hasRequiredBenefit": benefit,
         "regressionsOverTenPercent": regressions,
         "ocrOutputsIdentical": outputs_identical,
-        "eligibleForProduction": physical and benefit and not regressions and outputs_identical,
+        "baselineThermalStates": sorted(baseline_thermal),
+        "candidateThermalStates": sorted(candidate_thermal),
+        "thermalEvidenceValid": thermal_evidence_valid,
+        "eligibleForProduction": (
+            physical
+            and thermal_evidence_valid
+            and benefit
+            and not regressions
+            and outputs_identical
+        ),
     }
 
 
@@ -381,6 +398,9 @@ def compare_candidates(
             "hasRequiredBenefit": common["hasRequiredBenefit"],
             "regressionsOverTenPercent": common["regressionsOverTenPercent"],
             "ocrOutputsIdentical": common["ocrOutputsIdentical"],
+            "baselineThermalStates": common["baselineThermalStates"],
+            "candidateThermalStates": common["candidateThermalStates"],
+            "thermalEvidenceValid": common["thermalEvidenceValid"],
             "qualityDecision": quality_decisions.get(str(run.get("candidate")), "notProvided"),
         })
     return comparisons
@@ -391,6 +411,7 @@ def w8a8_decision(comparisons: list[dict[str, Any]]) -> dict[str, Any]:
     covered = {
         item["hardwareGroup"] for item in values
         if item["evidenceClass"] in PHYSICAL_EVIDENCE
+        and item["thermalEvidenceValid"]
     }
     modern = [item for item in values if item["hardwareGroup"] == "A17Pro-A19"]
     legacy = [
@@ -399,12 +420,14 @@ def w8a8_decision(comparisons: list[dict[str, Any]]) -> dict[str, Any]:
     quality_pass = bool(values) and all(item["qualityDecision"] == "pass" for item in values)
     modern_pass = bool(modern) and all(
         item["evidenceClass"] in PHYSICAL_EVIDENCE
+        and item["thermalEvidenceValid"]
         and item["hasRequiredBenefit"]
         and not item["regressionsOverTenPercent"]
         for item in modern
     )
     legacy_pass = {item["hardwareGroup"] for item in legacy} == {"A12-A13", "A14-A16"} and all(
         item["evidenceClass"] in PHYSICAL_EVIDENCE
+        and item["thermalEvidenceValid"]
         and not item["regressionsOverTenPercent"]
         for item in legacy
     )
@@ -437,6 +460,7 @@ def assess(
     covered = {
         item["hardwareGroup"] for item in comparisons
         if item["evidenceClass"] in PHYSICAL_EVIDENCE
+        and item["thermalEvidenceValid"]
     }
     eligible = (
         REQUIRED_HARDWARE_GROUPS <= covered
@@ -452,6 +476,7 @@ def assess(
             "latencyOrEnergyImprovement": BENEFIT_GATE,
             "maximumRegression": REGRESSION_GATE,
             "coreMLInferenceShareStopGate": 0.40,
+            "comparableThermalStates": sorted(COMPARABLE_THERMAL_STATES),
         },
         "reports": summaries,
         "pairedComputeUnitComparisons": comparisons,
