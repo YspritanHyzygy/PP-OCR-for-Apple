@@ -234,18 +234,28 @@ def validate_ane_compatibility_status(report: dict[str, Any], require_ready: boo
     assert [item["hardwareGroup"] for item in matrix] == [
         "A12-A13", "A14-A16", "A17Pro-A19"
     ]
-    assert all(item["evidenceStatus"] in {"notRecorded", "pass", "fail"} for item in matrix)
+    assert all(
+        item["evidenceStatus"]
+        in {"notRecorded", "localPhysicalSmokeOnly", "pass", "fail"}
+        for item in matrix
+    )
     assert report["candidates"] == ["B1", "small-rec320", "small-rec320-w8a8"]
     assert set(report["candidateStatus"]) == set(report["candidates"])
-    if any(item["evidenceStatus"] == "notRecorded" for item in matrix):
+    if any(item["evidenceStatus"] == "localPhysicalSmokeOnly" for item in matrix):
+        smoke = report["smokeEvidence"]
+        assert smoke["scope"].startswith("performance smoke only")
+        assert smoke["warmupRuns"] == 3
+        assert smoke["measurementRunsPerPair"] == 30
+        assert smoke["energy"] == "notMeasured"
+        assert smoke["qualityGate"] == "notEvaluatedByThisSmoke"
+    if any(item["evidenceStatus"] != "pass" for item in matrix):
         assert report["productionComputeUnits"] == "all"
         assert report["releaseBlocked"] is True
-        assert report["currentDecision"] == {
-            "userFacingNpuSwitch": False,
-            "chipModelAllowlist": False,
-            "hardwareSpecificPackages": False,
-            "reason": "No complete same-device A12, A16, and A18 Pro comparison exists.",
-        }
+        decision = report["currentDecision"]
+        assert decision["userFacingNpuSwitch"] is False
+        assert decision["chipModelAllowlist"] is False
+        assert decision["hardwareSpecificPackages"] is False
+        assert decision["reason"]
     if require_ready:
         assert report["status"] == "measured"
         assert all(item["evidenceStatus"] == "pass" for item in matrix)

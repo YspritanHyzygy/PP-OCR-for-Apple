@@ -2,7 +2,7 @@
 
 ## Current decision
 
-Verto continues to load every production OCR model with `MLComputeUnits.all`. There is no user-facing NPU switch, chip allowlist, or hardware-specific download package. This is a deliberate pending-evidence decision: Core ML can already schedule supported operations across the Neural Engine, GPU, and CPU, while the project does not yet have paired physical-device results for the A12, A16, and A18 Pro hardware groups.
+Verto continues to load every production OCR model with `MLComputeUnits.all`. There is no user-facing NPU switch, chip allowlist, or hardware-specific download package. Core ML can already schedule supported operations across the Neural Engine, GPU, and CPU. An iPhone 16 Pro physical-device smoke has now rejected a production switch to `cpuAndNeuralEngine` for every tested tier and candidate; A12-A13 and A14-A16 pairs are still required before the hardware matrix is complete.
 
 Every iPhone that can run Verto's minimum iOS 17 target has an Apple Neural Engine. The compatibility question is therefore not whether an NPU exists, but whether each Core ML operation is placed there and whether forcing CPU plus Neural Engine improves the complete OCR pipeline. Apple exposes compute-unit policy, not individual Neural Engine core selection.
 
@@ -25,6 +25,16 @@ Primary references:
 | future | Later A-series chips | Re-run the same capability-based protocol; never add a guessed model allowlist |
 
 Simulator and Apple-silicon Mac results can prove compilation and functional correctness only. They are never labelled as iPhone Neural Engine performance evidence.
+
+### Recorded iPhone 16 Pro smoke
+
+The current local physical smoke used an iPhone 16 Pro (`iPhone17,1`) on iOS 27.0 beta build `24A5424a`, one reproducible generated French image, three warm-ups, and 30 measurements per compute-unit policy. It ran B1 tiny, small, and medium plus `small-rec320`, pairing `all` with `cpuAndNeuralEngine` on the same phone.
+
+Forcing CPU plus Neural Engine changed warm end-to-end p50 by -2.1% to +3.9% across those four pairs. None reached the required 15% improvement, all OCR outputs stayed identical, and no measured latency or memory dimension crossed the 10% regression limit. B1 detector plans preferred the Neural Engine for 95.4%-96.1% of known cost; B1 recognizers preferred it for 98.4%-100%. Each non-compliant component contained a cost-bearing `pad` operation unsupported by the Neural Engine.
+
+`small-rec320` is less Neural-Engine-friendly than its B1 small parent on this OS build: its recognizer preferred the Neural Engine for only 74.8% of known cost, with three convolution operations preferring the CPU. Detector plus recognizer inference represented only 6.9%-18.9% of end-to-end time across the tested `all` runs, below the 40% stop gate. The current performance focus therefore moves to CPU preprocessing and post-processing rather than forcing more Neural Engine placement.
+
+This is a performance-path smoke, not a final benchmark. It uses one generated sample, records no energy measurement, does not replace the public quality corpus or private holdout, and does not prove stable-iOS or older-chip performance. The exact machine-readable boundary is maintained in [`benchmarks/ane-compatibility-v2.json`](../benchmarks/ane-compatibility-v2.json).
 
 ## What Verto records
 
@@ -112,8 +122,8 @@ Pass that file with `--quality-decisions`. Without it, W8A8 remains ineligible e
 
 The private 36-photo holdout stays on the local iPhone 16 Pro and is run only for final candidates. Remote physical-device sessions may receive public models and redistributable public or generated images only.
 
-## Remote-device boundary
+## Remaining physical-device boundary
 
-The intended remote representatives are an iPhone XS on iOS 17.4 or later and an A16 iPhone. A BrowserStack XCUITest session must run B1 and its candidate back-to-back on the same allocated device. The [device selector](https://www.browserstack.com/docs/app-automate/xcuitest/specify-devices) is an inventory request, not proof that a specific device will always be available.
+The available local representatives are an iPhone XR for A12-A13 and an iPhone 12 for the lower A14-A16 boundary. Each must run B1 small and `small-rec320` back-to-back under `all` and `cpuAndNeuralEngine`, with three warm-ups and 30 measurements. The iPhone 12 is an A14 device; it must not be described as A16 evidence even though it covers the same compatibility group.
 
-No cloud upload workflow is committed yet because v2 assets and the locked public corpus are still release-blocked, and no BrowserStack account or paid usage has been authorized. Adding credentials, uploading artifacts, or starting a paid session requires repository-owner approval. Until then, the versioned report must say that A12/A16 performance is unverified, and hardware-specific packaging remains forbidden.
+BrowserStack remains a fallback only if local older-device evidence cannot be completed. No cloud upload workflow is committed because v2 assets and the locked public corpus remain release-blocked, and no paid usage has been authorized. Until the two local pairs are recorded, the versioned report says that A12-A13 and A14-A16 performance is unverified and hardware-specific packaging remains forbidden.

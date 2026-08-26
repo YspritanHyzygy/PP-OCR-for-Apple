@@ -7,18 +7,18 @@
   "deviceMatrix": [
     {
       "hardwareGroup": "A12-A13",
-      "representative": "iPhone XS",
+      "representative": "iPhone XR",
       "evidenceStatus": "notRecorded"
     },
     {
       "hardwareGroup": "A14-A16",
-      "representative": "iPhone 14 Pro or iPhone 15",
+      "representative": "iPhone 12",
       "evidenceStatus": "notRecorded"
     },
     {
       "hardwareGroup": "A17Pro-A19",
       "representative": "iPhone 16 Pro",
-      "evidenceStatus": "notRecorded"
+      "evidenceStatus": "localPhysicalSmokeOnly"
     }
   ],
   "candidates": [
@@ -27,15 +27,44 @@
     "small-rec320-w8a8"
   ],
   "candidateStatus": {
-    "B1": "awaitingPhysicalEvidence",
-    "small-rec320": "awaitingPhysicalEvidence",
+    "B1": "a17ProPhysicalSmokeOnly",
+    "small-rec320": "a17ProPhysicalSmokeOnly",
     "small-rec320-w8a8": "builderAndRecognizerSmokeOnly"
   },
   "currentDecision": {
     "userFacingNpuSwitch": false,
     "chipModelAllowlist": false,
     "hardwareSpecificPackages": false,
-    "reason": "No complete same-device A12, A16, and A18 Pro comparison exists."
+    "reason": "On an iPhone 16 Pro physical-device smoke subset, cpuAndNeuralEngine did not reach the 15% benefit gate for B1 tiny, small, medium, or small-rec320, and Core ML inference remained below the 40% end-to-end focus gate. A12-A13 and A14-A16 paired evidence is still missing."
+  },
+  "smokeEvidence": {
+    "scope": "performance smoke only; one reproducible generated French sample",
+    "device": "iPhone 16 Pro",
+    "hardwareIdentifier": "iPhone17,1",
+    "operatingSystem": "iOS 27.0 beta (24A5424a)",
+    "warmupRuns": 3,
+    "measurementRunsPerPair": 30,
+    "computeUnitPairs": [
+      "all",
+      "cpuAndNeuralEngine"
+    ],
+    "testedCandidates": [
+      "B1 tiny",
+      "B1 small",
+      "B1 medium",
+      "small-rec320"
+    ],
+    "cpuAndNeuralEngineEndToEndP50RelativeChangeRange": [
+      -0.02131,
+      0.038563
+    ],
+    "coreMLInferenceFractionRange": [
+      0.068542,
+      0.189274
+    ],
+    "ocrOutputsIdentical": true,
+    "energy": "notMeasured",
+    "qualityGate": "notEvaluatedByThisSmoke"
   },
   "releaseBlocked": true
 }

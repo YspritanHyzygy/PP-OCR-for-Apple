@@ -21,6 +21,11 @@ class W8A8BuildTests(unittest.TestCase):
         report = json.loads(
             Path("benchmarks/ane-compatibility-v2.json").read_text(encoding="utf-8")
         )
+        self.assertEqual(
+            report["deviceMatrix"][2]["evidenceStatus"],
+            "localPhysicalSmokeOnly",
+        )
+        self.assertEqual(report["smokeEvidence"]["energy"], "notMeasured")
         validate_ane_compatibility_status(report, require_ready=False)
         with self.assertRaises(AssertionError):
             validate_ane_compatibility_status(report, require_ready=True)
