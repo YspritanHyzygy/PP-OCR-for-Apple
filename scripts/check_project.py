@@ -16,7 +16,7 @@ ROOT = Path(__file__).resolve().parents[1]
 TIERS = ("tiny", "small", "medium")
 SHA256 = re.compile(r"^[0-9a-f]{64}$")
 REVISION = re.compile(r"^[0-9a-f]{40}$")
-COMPRESSIONS = {"none", "int8", "palette8", "palette6"}
+COMPRESSIONS = {"none", "int8", "palette8", "palette6", "w8a8"}
 IO_TYPES = {"FLOAT32", "FLOAT16"}
 RECIPE_NAME = re.compile(r"^[a-z0-9][a-z0-9-]*$")
 
@@ -63,6 +63,9 @@ def validate_recipe(recipe: dict[str, Any]) -> None:
         assert config["recognizerCompression"] in COMPRESSIONS
         assert config["detectorIOType"] in IO_TYPES
         assert config["recognizerIOType"] in IO_TYPES
+        for component in ("detector", "recognizer"):
+            if config[f"{component}Compression"] == "w8a8":
+                assert config[f"{component}IOType"] == "FLOAT32"
 
 
 def validate_v1_manifest(
@@ -114,6 +117,11 @@ def validate_v2_manifest(
             assert item["inputOutputType"] in IO_TYPES
             assert item["computePrecision"] == "FLOAT16"
             assert item["weightCompression"] in COMPRESSIONS
+            assert item.get("activationQuantization", "none") in {"none", "int8"}
+            assert item.get("calibrationSamples", 0) >= 0
+            if item.get("activationQuantization") == "int8":
+                assert item["weightCompression"] == "int8"
+                assert item["calibrationSamples"] > 0
             assert item["rgbFoldMaxAbsoluteError"] >= 0
             assert item["conversionMaxAbsoluteError"] >= 0
         post = pack["detector"]["postProcess"]
@@ -125,6 +133,17 @@ def validate_v2_manifest(
         assert pack["recognizer"]["charactersCount"] > 0
         assert pack["recognizer"]["argmaxMismatches"] >= 0
         validate_archive(pack["archive"], tier, manifest["packVersion"], assets)
+    uses_activation_quantization = any(
+        pack[component].get("activationQuantization") == "int8"
+        for pack in manifest["packs"] for component in ("detector", "recognizer")
+    )
+    calibration = manifest.get("activationCalibration")
+    if uses_activation_quantization:
+        assert calibration["corpusFile"].endswith(".json")
+        assert SHA256.fullmatch(calibration["sha256"])
+        assert calibration["maximumSamplesPerComponent"] > 0
+    else:
+        assert calibration is None
 
 
 def validate_archive(archive: dict[str, Any], tier: str, version: str, assets: Path | None) -> None:
@@ -205,6 +224,45 @@ def validate_final_report(report: dict[str, Any]) -> None:
     assert tiers["small"]["substantiveImprovement"] is True
 
 
+def validate_ane_compatibility_status(report: dict[str, Any], require_ready: bool) -> None:
+    assert report["schemaVersion"] == 1
+    assert report["kind"] == "apple-neural-engine-compatibility-status"
+    assert report["releaseTag"] == "v2"
+    assert report["status"] in {"pendingPhysicalEvidence", "measured"}
+    assert report["productionComputeUnits"] in {"all", "cpuAndNeuralEngine"}
+    matrix = report["deviceMatrix"]
+    assert [item["hardwareGroup"] for item in matrix] == [
+        "A12-A13", "A14-A16", "A17Pro-A19"
+    ]
+    assert all(
+        item["evidenceStatus"]
+        in {"notRecorded", "localPhysicalSmokeOnly", "pass", "fail"}
+        for item in matrix
+    )
+    assert report["candidates"] == ["B1", "small-rec320", "small-rec320-w8a8"]
+    assert set(report["candidateStatus"]) == set(report["candidates"])
+    if any(item["evidenceStatus"] == "localPhysicalSmokeOnly" for item in matrix):
+        smoke = report["smokeEvidence"]
+        assert smoke["scope"].startswith("performance smoke only")
+        assert (ROOT / smoke["assessment"]).is_file()
+        assert smoke["warmupRuns"] == 3
+        assert smoke["measurementRunsPerPair"] == 30
+        assert smoke["energy"] == "notMeasured"
+        assert smoke["qualityGate"] == "notEvaluatedByThisSmoke"
+    if any(item["evidenceStatus"] != "pass" for item in matrix):
+        assert report["productionComputeUnits"] == "all"
+        assert report["releaseBlocked"] is True
+        decision = report["currentDecision"]
+        assert decision["userFacingNpuSwitch"] is False
+        assert decision["chipModelAllowlist"] is False
+        assert decision["hardwareSpecificPackages"] is False
+        assert decision["reason"]
+    if require_ready:
+        assert report["status"] == "measured"
+        assert all(item["evidenceStatus"] == "pass" for item in matrix)
+        assert report["releaseBlocked"] is False
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--manifest", type=Path)
@@ -217,10 +275,15 @@ def main() -> None:
     validate_sources(source_lock)
     recipe = load_json(args.recipe)
     validate_recipe(recipe)
+    for candidate_path in sorted((ROOT / "recipes/candidates").glob("*.json")):
+        validate_recipe(load_json(candidate_path))
     if args.require_release_ready and recipe["packVersion"] != "2":
         raise ValueError("release is blocked: the selected recipe packVersion is not 2")
     validate_corpus_lock(
         load_json(ROOT / "evaluation/corpus.lock.json"), args.require_release_ready
+    )
+    validate_ane_compatibility_status(
+        load_json(ROOT / "benchmarks/ane-compatibility-v2.json"), args.require_release_ready
     )
     if args.require_release_ready:
         final_report = ROOT / "benchmarks/v2-final.json"

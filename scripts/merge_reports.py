@@ -15,9 +15,12 @@ def merge(documents: list[dict[str, Any]]) -> dict[str, Any]:
     samples = []
     seen: set[str] = set()
     runs = []
+    schema_versions: set[int] = set()
     for document in documents:
-        if document.get("schemaVersion") != 1 or not isinstance(document.get("samples"), list):
-            raise ValueError("every report must use raw schemaVersion 1")
+        schema_version = document.get("schemaVersion")
+        if schema_version not in {1, 2} or not isinstance(document.get("samples"), list):
+            raise ValueError("every report must use raw schemaVersion 1 or 2")
+        schema_versions.add(schema_version)
         runs.append(document.get("run", {}))
         for sample in document["samples"]:
             sample_id = sample["id"]
@@ -25,7 +28,9 @@ def merge(documents: list[dict[str, Any]]) -> dict[str, Any]:
                 raise ValueError(f"duplicate sample id: {sample_id}")
             seen.add(sample_id)
             samples.append(sample)
-    return {"schemaVersion": 1, "run": {"mergedRuns": runs}, "samples": samples}
+    if len(schema_versions) != 1:
+        raise ValueError("cannot merge raw reports with different schema versions")
+    return {"schemaVersion": schema_versions.pop(), "run": {"mergedRuns": runs}, "samples": samples}
 
 
 def main() -> None:

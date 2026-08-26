@@ -10,5 +10,6 @@ The report records:
 - iOS 17 compile, Core ML load, and inference results;
 - a quality-gate result for tiny, small, and medium;
 - a substantive-improvement result for the default small tier.
+- a completed `benchmarks/ane-compatibility-v2.json` device matrix. Release validation rejects pending A12/A16/A18 Pro evidence even when the final quality report exists; the measured conclusion may still keep production on `all`.
 
 The file contains aggregate measurements only. Private photos and transcriptions remain outside git.

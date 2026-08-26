@@ -1,0 +1,2515 @@
+{
+  "schemaVersion": 1,
+  "kind": "apple-neural-engine-assessment",
+  "thresholds": {
+    "preferredNeuralEngineCostShare": 0.9,
+    "significantFallbackCostShare": 0.05,
+    "latencyOrEnergyImprovement": 0.15,
+    "maximumRegression": 0.1,
+    "coreMLInferenceShareStopGate": 0.4,
+    "comparableThermalStates": [
+      "fair",
+      "nominal"
+    ]
+  },
+  "reports": [
+    {
+      "run": {
+        "availableComputeDevices": [
+          "cpu",
+          "gpu",
+          "neuralEngine"
+        ],
+        "candidate": "B1",
+        "candidateKind": "reference",
+        "coldCompileMilliseconds": 114.64595794677734,
+        "coldLoadMilliseconds": 1081.8610191345215,
+        "computeUnits": "all",
+        "device": "iPhone",
+        "deviceLabel": "iPhone 16 Pro",
+        "energy": {
+          "source": "notMeasured"
+        },
+        "evidenceClass": "localPhysical",
+        "hardwareGroup": "A17Pro-A19",
+        "hardwareIdentifier": "iPhone17,1",
+        "measurementRunsPerSample": 30,
+        "operatingSystem": "Version 27.0 (Build 24A5424a)",
+        "processLifetimePeakResidentBytes": 170016768,
+        "residentMemoryBytesEnd": 169574400,
+        "residentMemoryBytesStart": 169984000,
+        "systemVersion": "27.0",
+        "thermalStateEnd": "nominal",
+        "thermalStateStart": "nominal",
+        "tier": "tiny",
+        "warmupRuns": 3
+      },
+      "placement": [
+        {
+          "component": "detector",
+          "status": "available",
+          "operationCount": 879,
+          "operationsWithoutDeviceUsage": 686,
+          "neuralEngineUnsupportedOperations": 1,
+          "weightedOperationsWithoutDeviceUsage": 0,
+          "weightedNeuralEngineUnsupportedOperations": 1,
+          "knownEstimatedCostWeight": 1.0000000000000007,
+          "preferredNeuralEngineCostShare": 0.9542307213071075,
+          "significantFallbackOperations": [],
+          "allSignificantFallbacksExplained": true,
+          "aneFriendly": false,
+          "error": null
+        },
+        {
+          "component": "recognizer",
+          "status": "available",
+          "operationCount": 386,
+          "operationsWithoutDeviceUsage": 304,
+          "neuralEngineUnsupportedOperations": 0,
+          "weightedOperationsWithoutDeviceUsage": 0,
+          "weightedNeuralEngineUnsupportedOperations": 0,
+          "knownEstimatedCostWeight": 0.9999999999999997,
+          "preferredNeuralEngineCostShare": 1.0,
+          "significantFallbackOperations": [],
+          "allSignificantFallbacksExplained": true,
+          "aneFriendly": true,
+          "error": null
+        }
+      ],
+      "performance": {
+        "measurementCount": 30,
+        "timingsMilliseconds": {
+          "decode": {
+            "p50": 16.17497205734253,
+            "p95": 17.211061716079712,
+            "count": 30
+          },
+          "detectionPostProcess": {
+            "p50": 49.934983253479004,
+            "p95": 52.30279564857483,
+            "count": 30
+          },
+          "detector": {
+            "p50": 12.120485305786133,
+            "p95": 15.277630090713501,
+            "count": 30
+          },
+          "endToEnd": {
+            "p50": 184.0694546699524,
+            "p95": 195.40596008300778,
+            "count": 30
+          },
+          "preprocessing": {
+            "p50": 104.75939512252808,
+            "p95": 113.98677229881284,
+            "count": 30
+          },
+          "recognizer": {
+            "p50": 0.7140040397644043,
+            "p95": 1.0554194450378416,
+            "count": 30
+          },
+          "recognizerPerLine": {
+            "p50": 0.7140040397644043,
+            "p95": 1.0554194450378416,
+            "count": 30
+          }
+        },
+        "processLifetimePeakResidentBytes": 170016768,
+        "thermalStates": [
+          "nominal"
+        ],
+        "energy": {
+          "source": "notMeasured"
+        },
+        "coreMLInferenceFraction": 0.06854158275703098,
+        "optimizationFocus": "cpuPreAndPostProcessing"
+      }
+    },
+    {
+      "run": {
+        "availableComputeDevices": [
+          "cpu",
+          "gpu",
+          "neuralEngine"
+        ],
+        "candidate": "B1",
+        "candidateKind": "reference",
+        "coldCompileMilliseconds": 99.98202323913574,
+        "coldLoadMilliseconds": 850.8940935134888,
+        "computeUnits": "cpuAndNeuralEngine",
+        "device": "iPhone",
+        "deviceLabel": "iPhone 16 Pro",
+        "energy": {
+          "source": "notMeasured"
+        },
+        "evidenceClass": "localPhysical",
+        "hardwareGroup": "A17Pro-A19",
+        "hardwareIdentifier": "iPhone17,1",
+        "measurementRunsPerSample": 30,
+        "operatingSystem": "Version 27.0 (Build 24A5424a)",
+        "processLifetimePeakResidentBytes": 168411136,
+        "residentMemoryBytesEnd": 168067072,
+        "residentMemoryBytesStart": 168378368,
+        "systemVersion": "27.0",
+        "thermalStateEnd": "nominal",
+        "thermalStateStart": "nominal",
+        "tier": "tiny",
+        "warmupRuns": 3
+      },
+      "placement": [
+        {
+          "component": "detector",
+          "status": "available",
+          "operationCount": 879,
+          "operationsWithoutDeviceUsage": 686,
+          "neuralEngineUnsupportedOperations": 1,
+          "weightedOperationsWithoutDeviceUsage": 0,
+          "weightedNeuralEngineUnsupportedOperations": 1,
+          "knownEstimatedCostWeight": 1.0000000000000004,
+          "preferredNeuralEngineCostShare": 0.9542307213071076,
+          "significantFallbackOperations": [],
+          "allSignificantFallbacksExplained": true,
+          "aneFriendly": null,
+          "error": null
+        },
+        {
+          "component": "recognizer",
+          "status": "available",
+          "operationCount": 386,
+          "operationsWithoutDeviceUsage": 304,
+          "neuralEngineUnsupportedOperations": 0,
+          "weightedOperationsWithoutDeviceUsage": 0,
+          "weightedNeuralEngineUnsupportedOperations": 0,
+          "knownEstimatedCostWeight": 0.9999999999999997,
+          "preferredNeuralEngineCostShare": 1.0,
+          "significantFallbackOperations": [],
+          "allSignificantFallbacksExplained": true,
+          "aneFriendly": null,
+          "error": null
+        }
+      ],
+      "performance": {
+        "measurementCount": 30,
+        "timingsMilliseconds": {
+          "decode": {
+            "p50": 15.988945960998535,
+            "p95": 16.7966365814209,
+            "count": 30
+          },
+          "detectionPostProcess": {
+            "p50": 49.211978912353516,
+            "p95": 53.334158658981316,
+            "count": 30
+          },
+          "detector": {
+            "p50": 11.998951435089111,
+            "p95": 15.48495888710022,
+            "count": 30
+          },
+          "endToEnd": {
+            "p50": 180.1469922065735,
+            "p95": 212.17591166496263,
+            "count": 30
+          },
+          "preprocessing": {
+            "p50": 101.95904970169067,
+            "p95": 114.14999961853023,
+            "count": 30
+          },
+          "recognizer": {
+            "p50": 0.7379651069641113,
+            "p95": 1.1073648929595936,
+            "count": 30
+          },
+          "recognizerPerLine": {
+            "p50": 0.7379651069641113,
+            "p95": 1.1073648929595936,
+            "count": 30
+          }
+        },
+        "processLifetimePeakResidentBytes": 168411136,
+        "thermalStates": [
+          "nominal"
+        ],
+        "energy": {
+          "source": "notMeasured"
+        },
+        "coreMLInferenceFraction": 0.06836118469788892,
+        "optimizationFocus": "cpuPreAndPostProcessing"
+      }
+    },
+    {
+      "run": {
+        "availableComputeDevices": [
+          "cpu",
+          "gpu",
+          "neuralEngine"
+        ],
+        "candidate": "B1",
+        "candidateKind": "reference",
+        "coldCompileMilliseconds": 122.810959815979,
+        "coldLoadMilliseconds": 1188.8139247894287,
+        "computeUnits": "all",
+        "device": "iPhone",
+        "deviceLabel": "iPhone 16 Pro",
+        "energy": {
+          "source": "notMeasured"
+        },
+        "evidenceClass": "localPhysical",
+        "hardwareGroup": "A17Pro-A19",
+        "hardwareIdentifier": "iPhone17,1",
+        "measurementRunsPerSample": 30,
+        "operatingSystem": "Version 27.0 (Build 24A5424a)",
+        "processLifetimePeakResidentBytes": 189480960,
+        "residentMemoryBytesEnd": 189136896,
+        "residentMemoryBytesStart": 189448192,
+        "systemVersion": "27.0",
+        "thermalStateEnd": "nominal",
+        "thermalStateStart": "nominal",
+        "tier": "small",
+        "warmupRuns": 3
+      },
+      "placement": [
+        {
+          "component": "detector",
+          "status": "available",
+          "operationCount": 879,
+          "operationsWithoutDeviceUsage": 686,
+          "neuralEngineUnsupportedOperations": 1,
+          "weightedOperationsWithoutDeviceUsage": 0,
+          "weightedNeuralEngineUnsupportedOperations": 1,
+          "knownEstimatedCostWeight": 1.0000000000000002,
+          "preferredNeuralEngineCostShare": 0.9558667141687371,
+          "significantFallbackOperations": [],
+          "allSignificantFallbacksExplained": true,
+          "aneFriendly": false,
+          "error": null
+        },
+        {
+          "component": "recognizer",
+          "status": "available",
+          "operationCount": 779,
+          "operationsWithoutDeviceUsage": 565,
+          "neuralEngineUnsupportedOperations": 1,
+          "weightedOperationsWithoutDeviceUsage": 0,
+          "weightedNeuralEngineUnsupportedOperations": 1,
+          "knownEstimatedCostWeight": 1.0000000000000002,
+          "preferredNeuralEngineCostShare": 0.9835983314494685,
+          "significantFallbackOperations": [],
+          "allSignificantFallbacksExplained": true,
+          "aneFriendly": false,
+          "error": null
+        }
+      ],
+      "performance": {
+        "measurementCount": 30,
+        "timingsMilliseconds": {
+          "decode": {
+            "p50": 45.30453681945801,
+            "p95": 46.60235643386841,
+            "count": 30
+          },
+          "detectionPostProcess": {
+            "p50": 48.67798089981079,
+            "p95": 50.83193778991699,
+            "count": 30
+          },
+          "detector": {
+            "p50": 17.15993881225586,
+            "p95": 21.484506130218506,
+            "count": 30
+          },
+          "endToEnd": {
+            "p50": 215.78997373580933,
+            "p95": 222.36867547035217,
+            "count": 30
+          },
+          "preprocessing": {
+            "p50": 103.31994295120239,
+            "p95": 104.9297034740448,
+            "count": 30
+          },
+          "recognizer": {
+            "p50": 1.9885897636413574,
+            "p95": 2.4732887744903564,
+            "count": 30
+          },
+          "recognizerPerLine": {
+            "p50": 1.9885897636413574,
+            "p95": 2.4732887744903564,
+            "count": 30
+          }
+        },
+        "processLifetimePeakResidentBytes": 189480960,
+        "thermalStates": [
+          "nominal"
+        ],
+        "energy": {
+          "source": "notMeasured"
+        },
+        "coreMLInferenceFraction": 0.08792845954428541,
+        "optimizationFocus": "cpuPreAndPostProcessing"
+      }
+    },
+    {
+      "run": {
+        "availableComputeDevices": [
+          "cpu",
+          "gpu",
+          "neuralEngine"
+        ],
+        "candidate": "B1",
+        "candidateKind": "reference",
+        "coldCompileMilliseconds": 120.79906463623047,
+        "coldLoadMilliseconds": 1199.7640132904053,
+        "computeUnits": "cpuAndNeuralEngine",
+        "device": "iPhone",
+        "deviceLabel": "iPhone 16 Pro",
+        "energy": {
+          "source": "notMeasured"
+        },
+        "evidenceClass": "localPhysical",
+        "hardwareGroup": "A17Pro-A19",
+        "hardwareIdentifier": "iPhone17,1",
+        "measurementRunsPerSample": 30,
+        "operatingSystem": "Version 27.0 (Build 24A5424a)",
+        "processLifetimePeakResidentBytes": 187154432,
+        "residentMemoryBytesEnd": 186351616,
+        "residentMemoryBytesStart": 187121664,
+        "systemVersion": "27.0",
+        "thermalStateEnd": "nominal",
+        "thermalStateStart": "nominal",
+        "tier": "small",
+        "warmupRuns": 3
+      },
+      "placement": [
+        {
+          "component": "detector",
+          "status": "available",
+          "operationCount": 879,
+          "operationsWithoutDeviceUsage": 686,
+          "neuralEngineUnsupportedOperations": 1,
+          "weightedOperationsWithoutDeviceUsage": 0,
+          "weightedNeuralEngineUnsupportedOperations": 1,
+          "knownEstimatedCostWeight": 1.0000000000000007,
+          "preferredNeuralEngineCostShare": 0.955866714168737,
+          "significantFallbackOperations": [],
+          "allSignificantFallbacksExplained": true,
+          "aneFriendly": null,
+          "error": null
+        },
+        {
+          "component": "recognizer",
+          "status": "available",
+          "operationCount": 779,
+          "operationsWithoutDeviceUsage": 565,
+          "neuralEngineUnsupportedOperations": 1,
+          "weightedOperationsWithoutDeviceUsage": 0,
+          "weightedNeuralEngineUnsupportedOperations": 1,
+          "knownEstimatedCostWeight": 1.0000000000000004,
+          "preferredNeuralEngineCostShare": 0.9835983314494686,
+          "significantFallbackOperations": [],
+          "allSignificantFallbacksExplained": true,
+          "aneFriendly": null,
+          "error": null
+        }
+      ],
+      "performance": {
+        "measurementCount": 30,
+        "timingsMilliseconds": {
+          "decode": {
+            "p50": 45.71253061294556,
+            "p95": 47.479063272476196,
+            "count": 30
+          },
+          "detectionPostProcess": {
+            "p50": 49.83949661254883,
+            "p95": 51.982706785202026,
+            "count": 30
+          },
+          "detector": {
+            "p50": 16.870498657226562,
+            "p95": 23.431950807571408,
+            "count": 30
+          },
+          "endToEnd": {
+            "p50": 220.36045789718628,
+            "p95": 228.2601833343506,
+            "count": 30
+          },
+          "preprocessing": {
+            "p50": 105.24392127990723,
+            "p95": 109.59994792938231,
+            "count": 30
+          },
+          "recognizer": {
+            "p50": 2.0464658737182617,
+            "p95": 2.7292013168334956,
+            "count": 30
+          },
+          "recognizerPerLine": {
+            "p50": 2.0464658737182617,
+            "p95": 2.7292013168334956,
+            "count": 30
+          }
+        },
+        "processLifetimePeakResidentBytes": 187154432,
+        "thermalStates": [
+          "nominal"
+        ],
+        "energy": {
+          "source": "notMeasured"
+        },
+        "coreMLInferenceFraction": 0.08982747841714613,
+        "optimizationFocus": "cpuPreAndPostProcessing"
+      }
+    },
+    {
+      "run": {
+        "availableComputeDevices": [
+          "cpu",
+          "gpu",
+          "neuralEngine"
+        ],
+        "candidate": "B1",
+        "candidateKind": "reference",
+        "coldCompileMilliseconds": 168.18499565124512,
+        "coldLoadMilliseconds": 1750.6519556045532,
+        "computeUnits": "all",
+        "device": "iPhone",
+        "deviceLabel": "iPhone 16 Pro",
+        "energy": {
+          "source": "notMeasured"
+        },
+        "evidenceClass": "localPhysical",
+        "hardwareGroup": "A17Pro-A19",
+        "hardwareIdentifier": "iPhone17,1",
+        "measurementRunsPerSample": 30,
+        "operatingSystem": "Version 27.0 (Build 24A5424a)",
+        "processLifetimePeakResidentBytes": 269303808,
+        "residentMemoryBytesEnd": 266108928,
+        "residentMemoryBytesStart": 266764288,
+        "systemVersion": "27.0",
+        "thermalStateEnd": "fair",
+        "thermalStateStart": "fair",
+        "tier": "medium",
+        "warmupRuns": 3
+      },
+      "placement": [
+        {
+          "component": "detector",
+          "status": "available",
+          "operationCount": 1155,
+          "operationsWithoutDeviceUsage": 928,
+          "neuralEngineUnsupportedOperations": 1,
+          "weightedOperationsWithoutDeviceUsage": 0,
+          "weightedNeuralEngineUnsupportedOperations": 1,
+          "knownEstimatedCostWeight": 0.9999999999999992,
+          "preferredNeuralEngineCostShare": 0.9605106718326417,
+          "significantFallbackOperations": [],
+          "allSignificantFallbacksExplained": true,
+          "aneFriendly": false,
+          "error": null
+        },
+        {
+          "component": "recognizer",
+          "status": "available",
+          "operationCount": 829,
+          "operationsWithoutDeviceUsage": 605,
+          "neuralEngineUnsupportedOperations": 1,
+          "weightedOperationsWithoutDeviceUsage": 0,
+          "weightedNeuralEngineUnsupportedOperations": 1,
+          "knownEstimatedCostWeight": 1.0000000000000004,
+          "preferredNeuralEngineCostShare": 0.9915716574300755,
+          "significantFallbackOperations": [],
+          "allSignificantFallbacksExplained": true,
+          "aneFriendly": false,
+          "error": null
+        }
+      ],
+      "performance": {
+        "measurementCount": 30,
+        "timingsMilliseconds": {
+          "decode": {
+            "p50": 44.97647285461426,
+            "p95": 46.330422163009644,
+            "count": 30
+          },
+          "detectionPostProcess": {
+            "p50": 50.184011459350586,
+            "p95": 51.49785876274109,
+            "count": 30
+          },
+          "detector": {
+            "p50": 41.70501232147217,
+            "p95": 51.45052671432495,
+            "count": 30
+          },
+          "endToEnd": {
+            "p50": 248.42602014541626,
+            "p95": 257.001131772995,
+            "count": 30
+          },
+          "preprocessing": {
+            "p50": 106.9459319114685,
+            "p95": 109.37777757644653,
+            "count": 30
+          },
+          "recognizer": {
+            "p50": 3.578484058380127,
+            "p95": 3.9130270481109615,
+            "count": 30
+          },
+          "recognizerPerLine": {
+            "p50": 3.578484058380127,
+            "p95": 3.9130270481109615,
+            "count": 30
+          }
+        },
+        "processLifetimePeakResidentBytes": 269303808,
+        "thermalStates": [
+          "fair"
+        ],
+        "energy": {
+          "source": "notMeasured"
+        },
+        "coreMLInferenceFraction": 0.1892736742951511,
+        "optimizationFocus": "cpuPreAndPostProcessing"
+      }
+    },
+    {
+      "run": {
+        "availableComputeDevices": [
+          "cpu",
+          "gpu",
+          "neuralEngine"
+        ],
+        "candidate": "B1",
+        "candidateKind": "reference",
+        "coldCompileMilliseconds": 178.14993858337402,
+        "coldLoadMilliseconds": 1770.524024963379,
+        "computeUnits": "cpuAndNeuralEngine",
+        "device": "iPhone",
+        "deviceLabel": "iPhone 16 Pro",
+        "energy": {
+          "source": "notMeasured"
+        },
+        "evidenceClass": "localPhysical",
+        "hardwareGroup": "A17Pro-A19",
+        "hardwareIdentifier": "iPhone17,1",
+        "measurementRunsPerSample": 30,
+        "operatingSystem": "Version 27.0 (Build 24A5424a)",
+        "processLifetimePeakResidentBytes": 264093696,
+        "residentMemoryBytesEnd": 263421952,
+        "residentMemoryBytesStart": 263995392,
+        "systemVersion": "27.0",
+        "thermalStateEnd": "fair",
+        "thermalStateStart": "fair",
+        "tier": "medium",
+        "warmupRuns": 3
+      },
+      "placement": [
+        {
+          "component": "detector",
+          "status": "available",
+          "operationCount": 1155,
+          "operationsWithoutDeviceUsage": 928,
+          "neuralEngineUnsupportedOperations": 1,
+          "weightedOperationsWithoutDeviceUsage": 0,
+          "weightedNeuralEngineUnsupportedOperations": 1,
+          "knownEstimatedCostWeight": 1.0000000000000002,
+          "preferredNeuralEngineCostShare": 0.9605106718326417,
+          "significantFallbackOperations": [],
+          "allSignificantFallbacksExplained": true,
+          "aneFriendly": null,
+          "error": null
+        },
+        {
+          "component": "recognizer",
+          "status": "available",
+          "operationCount": 829,
+          "operationsWithoutDeviceUsage": 605,
+          "neuralEngineUnsupportedOperations": 1,
+          "weightedOperationsWithoutDeviceUsage": 0,
+          "weightedNeuralEngineUnsupportedOperations": 1,
+          "knownEstimatedCostWeight": 1.0000000000000002,
+          "preferredNeuralEngineCostShare": 0.9915716574300755,
+          "significantFallbackOperations": [],
+          "allSignificantFallbacksExplained": true,
+          "aneFriendly": null,
+          "error": null
+        }
+      ],
+      "performance": {
+        "measurementCount": 30,
+        "timingsMilliseconds": {
+          "decode": {
+            "p50": 45.87101936340332,
+            "p95": 47.467005252838135,
+            "count": 30
+          },
+          "detectionPostProcess": {
+            "p50": 51.635026931762695,
+            "p95": 52.856576442718506,
+            "count": 30
+          },
+          "detector": {
+            "p50": 47.15847969055176,
+            "p95": 51.95675492286682,
+            "count": 30
+          },
+          "endToEnd": {
+            "p50": 258.0059766769409,
+            "p95": 262.4339818954468,
+            "count": 30
+          },
+          "preprocessing": {
+            "p50": 109.08550024032593,
+            "p95": 111.24047040939331,
+            "count": 30
+          },
+          "recognizer": {
+            "p50": 3.872990608215332,
+            "p95": 4.851675033569336,
+            "count": 30
+          },
+          "recognizerPerLine": {
+            "p50": 3.872990608215332,
+            "p95": 4.851675033569336,
+            "count": 30
+          }
+        },
+        "processLifetimePeakResidentBytes": 264093696,
+        "thermalStates": [
+          "fair"
+        ],
+        "energy": {
+          "source": "notMeasured"
+        },
+        "coreMLInferenceFraction": 0.19528426418086223,
+        "optimizationFocus": "cpuPreAndPostProcessing"
+      }
+    },
+    {
+      "run": {
+        "availableComputeDevices": [
+          "cpu",
+          "gpu",
+          "neuralEngine"
+        ],
+        "candidate": "small-rec320",
+        "candidateKind": "shape",
+        "coldCompileMilliseconds": 122.73097038269043,
+        "coldLoadMilliseconds": 1201.4060020446777,
+        "computeUnits": "all",
+        "device": "iPhone",
+        "deviceLabel": "iPhone 16 Pro",
+        "energy": {
+          "source": "notMeasured"
+        },
+        "evidenceClass": "localPhysical",
+        "hardwareGroup": "A17Pro-A19",
+        "hardwareIdentifier": "iPhone17,1",
+        "measurementRunsPerSample": 30,
+        "operatingSystem": "Version 27.0 (Build 24A5424a)",
+        "parentCandidate": "B1",
+        "processLifetimePeakResidentBytes": 189644800,
+        "residentMemoryBytesEnd": 188055552,
+        "residentMemoryBytesStart": 189612032,
+        "systemVersion": "27.0",
+        "thermalStateEnd": "fair",
+        "thermalStateStart": "fair",
+        "tier": "small",
+        "warmupRuns": 3
+      },
+      "placement": [
+        {
+          "component": "detector",
+          "status": "available",
+          "operationCount": 879,
+          "operationsWithoutDeviceUsage": 686,
+          "neuralEngineUnsupportedOperations": 1,
+          "weightedOperationsWithoutDeviceUsage": 0,
+          "weightedNeuralEngineUnsupportedOperations": 1,
+          "knownEstimatedCostWeight": 1.0000000000000004,
+          "preferredNeuralEngineCostShare": 0.9558667141687371,
+          "significantFallbackOperations": [],
+          "allSignificantFallbacksExplained": true,
+          "aneFriendly": false,
+          "error": null
+        },
+        {
+          "component": "recognizer",
+          "status": "available",
+          "operationCount": 779,
+          "operationsWithoutDeviceUsage": 565,
+          "neuralEngineUnsupportedOperations": 1,
+          "weightedOperationsWithoutDeviceUsage": 0,
+          "weightedNeuralEngineUnsupportedOperations": 1,
+          "knownEstimatedCostWeight": 1.0000000000000002,
+          "preferredNeuralEngineCostShare": 0.748146025112426,
+          "significantFallbackOperations": [
+            {
+              "path": "model/function:main/22:ios17.conv",
+              "operatorName": "ios17.conv",
+              "costShare": 0.05533447378696017,
+              "preferredComputeDevice": "cpu",
+              "fallbackReason": "coreMLPreferredOtherDevice",
+              "explanation": null
+            },
+            {
+              "path": "model/function:main/35:ios17.conv",
+              "operatorName": "ios17.conv",
+              "costShare": 0.11216996477602435,
+              "preferredComputeDevice": "cpu",
+              "fallbackReason": "coreMLPreferredOtherDevice",
+              "explanation": null
+            }
+          ],
+          "allSignificantFallbacksExplained": false,
+          "aneFriendly": false,
+          "error": null
+        }
+      ],
+      "performance": {
+        "measurementCount": 30,
+        "timingsMilliseconds": {
+          "decode": {
+            "p50": 46.97901010513306,
+            "p95": 49.11375641822815,
+            "count": 30
+          },
+          "detectionPostProcess": {
+            "p50": 51.61994695663452,
+            "p95": 54.36738729476929,
+            "count": 30
+          },
+          "detector": {
+            "p50": 15.888094902038574,
+            "p95": 21.676826477050778,
+            "count": 30
+          },
+          "endToEnd": {
+            "p50": 224.5800495147705,
+            "p95": 232.86494612693787,
+            "count": 30
+          },
+          "preprocessing": {
+            "p50": 108.09755325317383,
+            "p95": 111.42420172691345,
+            "count": 30
+          },
+          "recognizer": {
+            "p50": 1.4989376068115234,
+            "p95": 1.9884884357452393,
+            "count": 30
+          },
+          "recognizerPerLine": {
+            "p50": 1.4989376068115234,
+            "p95": 1.9884884357452393,
+            "count": 30
+          }
+        },
+        "processLifetimePeakResidentBytes": 189644800,
+        "thermalStates": [
+          "fair"
+        ],
+        "energy": {
+          "source": "notMeasured"
+        },
+        "coreMLInferenceFraction": 0.08001387175893872,
+        "optimizationFocus": "cpuPreAndPostProcessing"
+      }
+    },
+    {
+      "run": {
+        "availableComputeDevices": [
+          "cpu",
+          "gpu",
+          "neuralEngine"
+        ],
+        "candidate": "small-rec320",
+        "candidateKind": "shape",
+        "coldCompileMilliseconds": 123.8490343093872,
+        "coldLoadMilliseconds": 1191.4550065994263,
+        "computeUnits": "cpuAndNeuralEngine",
+        "device": "iPhone",
+        "deviceLabel": "iPhone 16 Pro",
+        "energy": {
+          "source": "notMeasured"
+        },
+        "evidenceClass": "localPhysical",
+        "hardwareGroup": "A17Pro-A19",
+        "hardwareIdentifier": "iPhone17,1",
+        "measurementRunsPerSample": 30,
+        "operatingSystem": "Version 27.0 (Build 24A5424a)",
+        "parentCandidate": "B1",
+        "processLifetimePeakResidentBytes": 187105280,
+        "residentMemoryBytesEnd": 186253312,
+        "residentMemoryBytesStart": 187072512,
+        "systemVersion": "27.0",
+        "thermalStateEnd": "fair",
+        "thermalStateStart": "fair",
+        "tier": "small",
+        "warmupRuns": 3
+      },
+      "placement": [
+        {
+          "component": "detector",
+          "status": "available",
+          "operationCount": 879,
+          "operationsWithoutDeviceUsage": 686,
+          "neuralEngineUnsupportedOperations": 1,
+          "weightedOperationsWithoutDeviceUsage": 0,
+          "weightedNeuralEngineUnsupportedOperations": 1,
+          "knownEstimatedCostWeight": 1.0000000000000007,
+          "preferredNeuralEngineCostShare": 0.955866714168737,
+          "significantFallbackOperations": [],
+          "allSignificantFallbacksExplained": true,
+          "aneFriendly": null,
+          "error": null
+        },
+        {
+          "component": "recognizer",
+          "status": "available",
+          "operationCount": 779,
+          "operationsWithoutDeviceUsage": 565,
+          "neuralEngineUnsupportedOperations": 1,
+          "weightedOperationsWithoutDeviceUsage": 0,
+          "weightedNeuralEngineUnsupportedOperations": 1,
+          "knownEstimatedCostWeight": 0.9999999999999999,
+          "preferredNeuralEngineCostShare": 0.748146025112426,
+          "significantFallbackOperations": [
+            {
+              "path": "model/function:main/22:ios17.conv",
+              "operatorName": "ios17.conv",
+              "costShare": 0.055334473786960166,
+              "preferredComputeDevice": "cpu",
+              "fallbackReason": "coreMLPreferredOtherDevice",
+              "explanation": null
+            },
+            {
+              "path": "model/function:main/35:ios17.conv",
+              "operatorName": "ios17.conv",
+              "costShare": 0.11216996477602435,
+              "preferredComputeDevice": "cpu",
+              "fallbackReason": "coreMLPreferredOtherDevice",
+              "explanation": null
+            }
+          ],
+          "allSignificantFallbacksExplained": false,
+          "aneFriendly": null,
+          "error": null
+        }
+      ],
+      "performance": {
+        "measurementCount": 30,
+        "timingsMilliseconds": {
+          "decode": {
+            "p50": 48.0160117149353,
+            "p95": 51.052677631378174,
+            "count": 30
+          },
+          "detectionPostProcess": {
+            "p50": 52.45351791381836,
+            "p95": 55.532968044281006,
+            "count": 30
+          },
+          "detector": {
+            "p50": 17.266571521759033,
+            "p95": 22.399866580963135,
+            "count": 30
+          },
+          "endToEnd": {
+            "p50": 227.27090120315552,
+            "p95": 234.7748339176178,
+            "count": 30
+          },
+          "preprocessing": {
+            "p50": 108.76196622848511,
+            "p95": 112.1101975440979,
+            "count": 30
+          },
+          "recognizer": {
+            "p50": 1.4944672584533691,
+            "p95": 1.9305527210235591,
+            "count": 30
+          },
+          "recognizerPerLine": {
+            "p50": 1.4944672584533691,
+            "p95": 1.9305527210235591,
+            "count": 30
+          }
+        },
+        "processLifetimePeakResidentBytes": 187105280,
+        "thermalStates": [
+          "fair"
+        ],
+        "energy": {
+          "source": "notMeasured"
+        },
+        "coreMLInferenceFraction": 0.08145241319690048,
+        "optimizationFocus": "cpuPreAndPostProcessing"
+      }
+    },
+    {
+      "run": {
+        "availableComputeDevices": [
+          "cpu",
+          "gpu",
+          "neuralEngine"
+        ],
+        "candidate": "B1",
+        "candidateKind": "reference",
+        "coldCompileMilliseconds": 630.7200193405151,
+        "coldLoadMilliseconds": 3801.182985305786,
+        "computeUnits": "all",
+        "device": "iPhone",
+        "deviceLabel": "iPhone XR",
+        "energy": {
+          "source": "notMeasured"
+        },
+        "evidenceClass": "localPhysical",
+        "hardwareGroup": "A12-A13",
+        "hardwareIdentifier": "iPhone11,8",
+        "measurementRunsPerSample": 30,
+        "operatingSystem": "Version 18.5 (Build 22F76)",
+        "processLifetimePeakResidentBytes": 139640832,
+        "residentMemoryBytesEnd": 99893248,
+        "residentMemoryBytesStart": 117555200,
+        "systemVersion": "18.5",
+        "thermalStateEnd": "serious",
+        "thermalStateStart": "fair",
+        "tier": "small",
+        "warmupRuns": 3
+      },
+      "placement": [
+        {
+          "component": "detector",
+          "status": "available",
+          "operationCount": 879,
+          "operationsWithoutDeviceUsage": 711,
+          "neuralEngineUnsupportedOperations": 1,
+          "weightedOperationsWithoutDeviceUsage": 0,
+          "weightedNeuralEngineUnsupportedOperations": 0,
+          "knownEstimatedCostWeight": 0,
+          "preferredNeuralEngineCostShare": null,
+          "significantFallbackOperations": [],
+          "allSignificantFallbacksExplained": true,
+          "aneFriendly": false,
+          "error": null
+        },
+        {
+          "component": "recognizer",
+          "status": "available",
+          "operationCount": 779,
+          "operationsWithoutDeviceUsage": 579,
+          "neuralEngineUnsupportedOperations": 77,
+          "weightedOperationsWithoutDeviceUsage": 0,
+          "weightedNeuralEngineUnsupportedOperations": 0,
+          "knownEstimatedCostWeight": 0,
+          "preferredNeuralEngineCostShare": null,
+          "significantFallbackOperations": [],
+          "allSignificantFallbacksExplained": true,
+          "aneFriendly": false,
+          "error": null
+        }
+      ],
+      "performance": {
+        "measurementCount": 30,
+        "timingsMilliseconds": {
+          "decode": {
+            "p50": 190.67203998565674,
+            "p95": 203.70728373527527,
+            "count": 30
+          },
+          "detectionPostProcess": {
+            "p50": 216.75699949264526,
+            "p95": 235.08681058883664,
+            "count": 30
+          },
+          "detector": {
+            "p50": 38.977980613708496,
+            "p95": 41.07740521430969,
+            "count": 30
+          },
+          "endToEnd": {
+            "p50": 811.7904663085938,
+            "p95": 865.5820488929747,
+            "count": 30
+          },
+          "preprocessing": {
+            "p50": 349.6394753456116,
+            "p95": 373.18325042724604,
+            "count": 30
+          },
+          "recognizer": {
+            "p50": 14.941573143005371,
+            "p95": 15.545696020126343,
+            "count": 30
+          },
+          "recognizerPerLine": {
+            "p50": 14.941573143005371,
+            "p95": 15.545696020126343,
+            "count": 30
+          }
+        },
+        "processLifetimePeakResidentBytes": 139640832,
+        "thermalStates": [
+          "fair",
+          "serious"
+        ],
+        "energy": {
+          "source": "notMeasured"
+        },
+        "coreMLInferenceFraction": 0.06575856017441455,
+        "optimizationFocus": "cpuPreAndPostProcessing"
+      }
+    },
+    {
+      "run": {
+        "availableComputeDevices": [
+          "cpu",
+          "gpu",
+          "neuralEngine"
+        ],
+        "candidate": "B1",
+        "candidateKind": "reference",
+        "coldCompileMilliseconds": 903.3539295196533,
+        "coldLoadMilliseconds": 6683.950066566467,
+        "computeUnits": "cpuAndNeuralEngine",
+        "device": "iPhone",
+        "deviceLabel": "iPhone XR",
+        "energy": {
+          "source": "notMeasured"
+        },
+        "evidenceClass": "localPhysical",
+        "hardwareGroup": "A12-A13",
+        "hardwareIdentifier": "iPhone11,8",
+        "measurementRunsPerSample": 30,
+        "operatingSystem": "Version 18.5 (Build 22F76)",
+        "processLifetimePeakResidentBytes": 163184640,
+        "residentMemoryBytesEnd": 144654336,
+        "residentMemoryBytesStart": 144637952,
+        "systemVersion": "18.5",
+        "thermalStateEnd": "serious",
+        "thermalStateStart": "serious",
+        "tier": "small",
+        "warmupRuns": 3
+      },
+      "placement": [
+        {
+          "component": "detector",
+          "status": "available",
+          "operationCount": 879,
+          "operationsWithoutDeviceUsage": 711,
+          "neuralEngineUnsupportedOperations": 1,
+          "weightedOperationsWithoutDeviceUsage": 0,
+          "weightedNeuralEngineUnsupportedOperations": 0,
+          "knownEstimatedCostWeight": 0,
+          "preferredNeuralEngineCostShare": null,
+          "significantFallbackOperations": [],
+          "allSignificantFallbacksExplained": true,
+          "aneFriendly": null,
+          "error": null
+        },
+        {
+          "component": "recognizer",
+          "status": "available",
+          "operationCount": 779,
+          "operationsWithoutDeviceUsage": 579,
+          "neuralEngineUnsupportedOperations": 77,
+          "weightedOperationsWithoutDeviceUsage": 0,
+          "weightedNeuralEngineUnsupportedOperations": 0,
+          "knownEstimatedCostWeight": 0,
+          "preferredNeuralEngineCostShare": null,
+          "significantFallbackOperations": [],
+          "allSignificantFallbacksExplained": true,
+          "aneFriendly": null,
+          "error": null
+        }
+      ],
+      "performance": {
+        "measurementCount": 30,
+        "timingsMilliseconds": {
+          "decode": {
+            "p50": 271.1905241012573,
+            "p95": 296.0014045238495,
+            "count": 30
+          },
+          "detectionPostProcess": {
+            "p50": 309.9899888038635,
+            "p95": 369.26034688949585,
+            "count": 30
+          },
+          "detector": {
+            "p50": 43.20502281188965,
+            "p95": 45.17209529876709,
+            "count": 30
+          },
+          "endToEnd": {
+            "p50": 1182.03604221344,
+            "p95": 1213.954097032547,
+            "count": 30
+          },
+          "preprocessing": {
+            "p50": 515.0236487388611,
+            "p95": 533.3933532238007,
+            "count": 30
+          },
+          "recognizer": {
+            "p50": 28.91850471496582,
+            "p95": 34.366196393966675,
+            "count": 30
+          },
+          "recognizerPerLine": {
+            "p50": 28.91850471496582,
+            "p95": 34.366196393966675,
+            "count": 30
+          }
+        },
+        "processLifetimePeakResidentBytes": 163184640,
+        "thermalStates": [
+          "serious"
+        ],
+        "energy": {
+          "source": "notMeasured"
+        },
+        "coreMLInferenceFraction": 0.06152735094331302,
+        "optimizationFocus": "cpuPreAndPostProcessing"
+      }
+    },
+    {
+      "run": {
+        "availableComputeDevices": [
+          "cpu",
+          "gpu",
+          "neuralEngine"
+        ],
+        "candidate": "small-rec320",
+        "candidateKind": "shape",
+        "coldCompileMilliseconds": 670.2389717102051,
+        "coldLoadMilliseconds": 3662.5850200653076,
+        "computeUnits": "all",
+        "device": "iPhone",
+        "deviceLabel": "iPhone XR",
+        "energy": {
+          "source": "notMeasured"
+        },
+        "evidenceClass": "localPhysical",
+        "hardwareGroup": "A12-A13",
+        "hardwareIdentifier": "iPhone11,8",
+        "measurementRunsPerSample": 30,
+        "operatingSystem": "Version 18.5 (Build 22F76)",
+        "parentCandidate": "B1",
+        "processLifetimePeakResidentBytes": 161251328,
+        "residentMemoryBytesEnd": 110477312,
+        "residentMemoryBytesStart": 135249920,
+        "systemVersion": "18.5",
+        "thermalStateEnd": "serious",
+        "thermalStateStart": "serious",
+        "tier": "small",
+        "warmupRuns": 3
+      },
+      "placement": [
+        {
+          "component": "detector",
+          "status": "available",
+          "operationCount": 879,
+          "operationsWithoutDeviceUsage": 711,
+          "neuralEngineUnsupportedOperations": 1,
+          "weightedOperationsWithoutDeviceUsage": 0,
+          "weightedNeuralEngineUnsupportedOperations": 0,
+          "knownEstimatedCostWeight": 0,
+          "preferredNeuralEngineCostShare": null,
+          "significantFallbackOperations": [],
+          "allSignificantFallbacksExplained": true,
+          "aneFriendly": false,
+          "error": null
+        },
+        {
+          "component": "recognizer",
+          "status": "available",
+          "operationCount": 779,
+          "operationsWithoutDeviceUsage": 579,
+          "neuralEngineUnsupportedOperations": 71,
+          "weightedOperationsWithoutDeviceUsage": 0,
+          "weightedNeuralEngineUnsupportedOperations": 0,
+          "knownEstimatedCostWeight": 0,
+          "preferredNeuralEngineCostShare": null,
+          "significantFallbackOperations": [],
+          "allSignificantFallbacksExplained": true,
+          "aneFriendly": false,
+          "error": null
+        }
+      ],
+      "performance": {
+        "measurementCount": 30,
+        "timingsMilliseconds": {
+          "decode": {
+            "p50": 253.7500262260437,
+            "p95": 284.77141857147217,
+            "count": 30
+          },
+          "detectionPostProcess": {
+            "p50": 289.54803943634033,
+            "p95": 403.9205491542815,
+            "count": 30
+          },
+          "detector": {
+            "p50": 41.50652885437012,
+            "p95": 44.06977891921997,
+            "count": 30
+          },
+          "endToEnd": {
+            "p50": 1050.0199794769287,
+            "p95": 1252.2711992263794,
+            "count": 30
+          },
+          "preprocessing": {
+            "p50": 450.9739875793457,
+            "p95": 559.5702588558197,
+            "count": 30
+          },
+          "recognizer": {
+            "p50": 11.41047477722168,
+            "p95": 12.483596801757812,
+            "count": 30
+          },
+          "recognizerPerLine": {
+            "p50": 11.41047477722168,
+            "p95": 12.483596801757812,
+            "count": 30
+          }
+        },
+        "processLifetimePeakResidentBytes": 161251328,
+        "thermalStates": [
+          "serious"
+        ],
+        "energy": {
+          "source": "notMeasured"
+        },
+        "coreMLInferenceFraction": 0.0495511245500602,
+        "optimizationFocus": "cpuPreAndPostProcessing"
+      }
+    },
+    {
+      "run": {
+        "availableComputeDevices": [
+          "cpu",
+          "gpu",
+          "neuralEngine"
+        ],
+        "candidate": "small-rec320",
+        "candidateKind": "shape",
+        "coldCompileMilliseconds": 736.8539571762085,
+        "coldLoadMilliseconds": 5610.1590394973755,
+        "computeUnits": "cpuAndNeuralEngine",
+        "device": "iPhone",
+        "deviceLabel": "iPhone XR",
+        "energy": {
+          "source": "notMeasured"
+        },
+        "evidenceClass": "localPhysical",
+        "hardwareGroup": "A12-A13",
+        "hardwareIdentifier": "iPhone11,8",
+        "measurementRunsPerSample": 30,
+        "operatingSystem": "Version 18.5 (Build 22F76)",
+        "parentCandidate": "B1",
+        "processLifetimePeakResidentBytes": 146849792,
+        "residentMemoryBytesEnd": 121110528,
+        "residentMemoryBytesStart": 120438784,
+        "systemVersion": "18.5",
+        "thermalStateEnd": "serious",
+        "thermalStateStart": "serious",
+        "tier": "small",
+        "warmupRuns": 3
+      },
+      "placement": [
+        {
+          "component": "detector",
+          "status": "available",
+          "operationCount": 879,
+          "operationsWithoutDeviceUsage": 711,
+          "neuralEngineUnsupportedOperations": 1,
+          "weightedOperationsWithoutDeviceUsage": 0,
+          "weightedNeuralEngineUnsupportedOperations": 0,
+          "knownEstimatedCostWeight": 0,
+          "preferredNeuralEngineCostShare": null,
+          "significantFallbackOperations": [],
+          "allSignificantFallbacksExplained": true,
+          "aneFriendly": null,
+          "error": null
+        },
+        {
+          "component": "recognizer",
+          "status": "available",
+          "operationCount": 779,
+          "operationsWithoutDeviceUsage": 579,
+          "neuralEngineUnsupportedOperations": 71,
+          "weightedOperationsWithoutDeviceUsage": 0,
+          "weightedNeuralEngineUnsupportedOperations": 0,
+          "knownEstimatedCostWeight": 0,
+          "preferredNeuralEngineCostShare": null,
+          "significantFallbackOperations": [],
+          "allSignificantFallbacksExplained": true,
+          "aneFriendly": null,
+          "error": null
+        }
+      ],
+      "performance": {
+        "measurementCount": 30,
+        "timingsMilliseconds": {
+          "decode": {
+            "p50": 267.7609920501709,
+            "p95": 293.06701421737665,
+            "count": 30
+          },
+          "detectionPostProcess": {
+            "p50": 304.81553077697754,
+            "p95": 353.78108620643616,
+            "count": 30
+          },
+          "detector": {
+            "p50": 42.410969734191895,
+            "p95": 45.45348286628723,
+            "count": 30
+          },
+          "endToEnd": {
+            "p50": 1139.5010352134705,
+            "p95": 1186.6762459278107,
+            "count": 30
+          },
+          "preprocessing": {
+            "p50": 498.308002948761,
+            "p95": 532.0557832717896,
+            "count": 30
+          },
+          "recognizer": {
+            "p50": 13.175487518310547,
+            "p95": 17.32603907585144,
+            "count": 30
+          },
+          "recognizerPerLine": {
+            "p50": 13.175487518310547,
+            "p95": 17.32603907585144,
+            "count": 30
+          }
+        },
+        "processLifetimePeakResidentBytes": 146849792,
+        "thermalStates": [
+          "serious"
+        ],
+        "energy": {
+          "source": "notMeasured"
+        },
+        "coreMLInferenceFraction": 0.04966147239697146,
+        "optimizationFocus": "cpuPreAndPostProcessing"
+      }
+    },
+    {
+      "run": {
+        "availableComputeDevices": [
+          "cpu",
+          "gpu",
+          "neuralEngine"
+        ],
+        "candidate": "B1",
+        "candidateKind": "reference",
+        "coldCompileMilliseconds": 303.8889169692993,
+        "coldLoadMilliseconds": 2040.2220487594604,
+        "computeUnits": "all",
+        "device": "iPhone",
+        "deviceLabel": "iPhone 12",
+        "energy": {
+          "source": "notMeasured"
+        },
+        "evidenceClass": "localPhysical",
+        "hardwareGroup": "A14-A16",
+        "hardwareIdentifier": "iPhone13,2",
+        "measurementRunsPerSample": 30,
+        "operatingSystem": "Version 18.4 (Build 22E5232a)",
+        "processLifetimePeakResidentBytes": 173850624,
+        "residentMemoryBytesEnd": 136462336,
+        "residentMemoryBytesStart": 145883136,
+        "systemVersion": "18.4",
+        "thermalStateEnd": "nominal",
+        "thermalStateStart": "nominal",
+        "tier": "small",
+        "warmupRuns": 3
+      },
+      "placement": [
+        {
+          "component": "detector",
+          "status": "available",
+          "operationCount": 879,
+          "operationsWithoutDeviceUsage": 686,
+          "neuralEngineUnsupportedOperations": 3,
+          "weightedOperationsWithoutDeviceUsage": 0,
+          "weightedNeuralEngineUnsupportedOperations": 3,
+          "knownEstimatedCostWeight": 0.9999999999999997,
+          "preferredNeuralEngineCostShare": 0.903465482201169,
+          "significantFallbackOperations": [],
+          "allSignificantFallbacksExplained": true,
+          "aneFriendly": false,
+          "error": null
+        },
+        {
+          "component": "recognizer",
+          "status": "available",
+          "operationCount": 779,
+          "operationsWithoutDeviceUsage": 565,
+          "neuralEngineUnsupportedOperations": 4,
+          "weightedOperationsWithoutDeviceUsage": 0,
+          "weightedNeuralEngineUnsupportedOperations": 4,
+          "knownEstimatedCostWeight": 0.9999999999999999,
+          "preferredNeuralEngineCostShare": 0.7599177620059233,
+          "significantFallbackOperations": [
+            {
+              "path": "model/function:main/776:ios16.softmax",
+              "operatorName": "ios16.softmax",
+              "costShare": 0.08441179847590567,
+              "preferredComputeDevice": "cpu",
+              "fallbackReason": "neuralEngineUnsupported",
+              "explanation": null
+            },
+            {
+              "path": "model/function:main/778:ios17.cast",
+              "operatorName": "ios17.cast",
+              "costShare": 0.12661761312165307,
+              "preferredComputeDevice": "cpu",
+              "fallbackReason": "neuralEngineUnsupported",
+              "explanation": null
+            }
+          ],
+          "allSignificantFallbacksExplained": false,
+          "aneFriendly": false,
+          "error": null
+        }
+      ],
+      "performance": {
+        "measurementCount": 30,
+        "timingsMilliseconds": {
+          "decode": {
+            "p50": 132.15798139572144,
+            "p95": 134.20549035072327,
+            "count": 30
+          },
+          "detectionPostProcess": {
+            "p50": 152.76497602462769,
+            "p95": 157.5084686279297,
+            "count": 30
+          },
+          "detector": {
+            "p50": 18.683969974517822,
+            "p95": 20.456820726394653,
+            "count": 30
+          },
+          "endToEnd": {
+            "p50": 550.4040122032166,
+            "p95": 562.1131241321564,
+            "count": 30
+          },
+          "preprocessing": {
+            "p50": 242.22052097320557,
+            "p95": 251.30072236061093,
+            "count": 30
+          },
+          "recognizer": {
+            "p50": 3.665447235107422,
+            "p95": 3.9599657058715816,
+            "count": 30
+          },
+          "recognizerPerLine": {
+            "p50": 3.665447235107422,
+            "p95": 3.9599657058715816,
+            "count": 30
+          }
+        },
+        "processLifetimePeakResidentBytes": 173850624,
+        "thermalStates": [
+          "nominal"
+        ],
+        "energy": {
+          "source": "notMeasured"
+        },
+        "coreMLInferenceFraction": 0.040307770858124606,
+        "optimizationFocus": "cpuPreAndPostProcessing"
+      }
+    },
+    {
+      "run": {
+        "availableComputeDevices": [
+          "cpu",
+          "gpu",
+          "neuralEngine"
+        ],
+        "candidate": "B1",
+        "candidateKind": "reference",
+        "coldCompileMilliseconds": 270.0009346008301,
+        "coldLoadMilliseconds": 1919.113039970398,
+        "computeUnits": "cpuAndNeuralEngine",
+        "device": "iPhone",
+        "deviceLabel": "iPhone 12",
+        "energy": {
+          "source": "notMeasured"
+        },
+        "evidenceClass": "localPhysical",
+        "hardwareGroup": "A14-A16",
+        "hardwareIdentifier": "iPhone13,2",
+        "measurementRunsPerSample": 30,
+        "operatingSystem": "Version 18.4 (Build 22E5232a)",
+        "processLifetimePeakResidentBytes": 181452800,
+        "residentMemoryBytesEnd": 166641664,
+        "residentMemoryBytesStart": 166658048,
+        "systemVersion": "18.4",
+        "thermalStateEnd": "nominal",
+        "thermalStateStart": "nominal",
+        "tier": "small",
+        "warmupRuns": 3
+      },
+      "placement": [
+        {
+          "component": "detector",
+          "status": "available",
+          "operationCount": 879,
+          "operationsWithoutDeviceUsage": 686,
+          "neuralEngineUnsupportedOperations": 3,
+          "weightedOperationsWithoutDeviceUsage": 0,
+          "weightedNeuralEngineUnsupportedOperations": 3,
+          "knownEstimatedCostWeight": 1.0000000000000002,
+          "preferredNeuralEngineCostShare": 0.903465482201169,
+          "significantFallbackOperations": [],
+          "allSignificantFallbacksExplained": true,
+          "aneFriendly": null,
+          "error": null
+        },
+        {
+          "component": "recognizer",
+          "status": "available",
+          "operationCount": 779,
+          "operationsWithoutDeviceUsage": 565,
+          "neuralEngineUnsupportedOperations": 4,
+          "weightedOperationsWithoutDeviceUsage": 0,
+          "weightedNeuralEngineUnsupportedOperations": 4,
+          "knownEstimatedCostWeight": 1.0,
+          "preferredNeuralEngineCostShare": 0.7599177620059232,
+          "significantFallbackOperations": [
+            {
+              "path": "model/function:main/776:ios16.softmax",
+              "operatorName": "ios16.softmax",
+              "costShare": 0.08441179847590567,
+              "preferredComputeDevice": "cpu",
+              "fallbackReason": "neuralEngineUnsupported",
+              "explanation": null
+            },
+            {
+              "path": "model/function:main/778:ios17.cast",
+              "operatorName": "ios17.cast",
+              "costShare": 0.12661761312165307,
+              "preferredComputeDevice": "cpu",
+              "fallbackReason": "neuralEngineUnsupported",
+              "explanation": null
+            }
+          ],
+          "allSignificantFallbacksExplained": false,
+          "aneFriendly": null,
+          "error": null
+        }
+      ],
+      "performance": {
+        "measurementCount": 30,
+        "timingsMilliseconds": {
+          "decode": {
+            "p50": 136.73049211502075,
+            "p95": 142.0648455619812,
+            "count": 30
+          },
+          "detectionPostProcess": {
+            "p50": 157.28002786636353,
+            "p95": 163.13642263412476,
+            "count": 30
+          },
+          "detector": {
+            "p50": 18.742501735687256,
+            "p95": 20.44854760169983,
+            "count": 30
+          },
+          "endToEnd": {
+            "p50": 573.1674432754517,
+            "p95": 588.7635946273804,
+            "count": 30
+          },
+          "preprocessing": {
+            "p50": 255.6474804878235,
+            "p95": 263.79014253616333,
+            "count": 30
+          },
+          "recognizer": {
+            "p50": 3.63844633102417,
+            "p95": 3.8961291313171387,
+            "count": 30
+          },
+          "recognizerPerLine": {
+            "p50": 3.63844633102417,
+            "p95": 3.8961291313171387,
+            "count": 30
+          }
+        },
+        "processLifetimePeakResidentBytes": 181452800,
+        "thermalStates": [
+          "nominal"
+        ],
+        "energy": {
+          "source": "notMeasured"
+        },
+        "coreMLInferenceFraction": 0.03918901943466555,
+        "optimizationFocus": "cpuPreAndPostProcessing"
+      }
+    },
+    {
+      "run": {
+        "availableComputeDevices": [
+          "cpu",
+          "gpu",
+          "neuralEngine"
+        ],
+        "candidate": "small-rec320",
+        "candidateKind": "shape",
+        "coldCompileMilliseconds": 250.21398067474365,
+        "coldLoadMilliseconds": 2391.4999961853027,
+        "computeUnits": "all",
+        "device": "iPhone",
+        "deviceLabel": "iPhone 12",
+        "energy": {
+          "source": "notMeasured"
+        },
+        "evidenceClass": "localPhysical",
+        "hardwareGroup": "A14-A16",
+        "hardwareIdentifier": "iPhone13,2",
+        "measurementRunsPerSample": 30,
+        "operatingSystem": "Version 18.4 (Build 22E5232a)",
+        "parentCandidate": "B1",
+        "processLifetimePeakResidentBytes": 178257920,
+        "residentMemoryBytesEnd": 163069952,
+        "residentMemoryBytesStart": 163463168,
+        "systemVersion": "18.4",
+        "thermalStateEnd": "fair",
+        "thermalStateStart": "fair",
+        "tier": "small",
+        "warmupRuns": 3
+      },
+      "placement": [
+        {
+          "component": "detector",
+          "status": "available",
+          "operationCount": 879,
+          "operationsWithoutDeviceUsage": 686,
+          "neuralEngineUnsupportedOperations": 3,
+          "weightedOperationsWithoutDeviceUsage": 0,
+          "weightedNeuralEngineUnsupportedOperations": 3,
+          "knownEstimatedCostWeight": 1.0000000000000002,
+          "preferredNeuralEngineCostShare": 0.903465482201169,
+          "significantFallbackOperations": [],
+          "allSignificantFallbacksExplained": true,
+          "aneFriendly": false,
+          "error": null
+        },
+        {
+          "component": "recognizer",
+          "status": "available",
+          "operationCount": 779,
+          "operationsWithoutDeviceUsage": 584,
+          "neuralEngineUnsupportedOperations": 2,
+          "weightedOperationsWithoutDeviceUsage": 0,
+          "weightedNeuralEngineUnsupportedOperations": 0,
+          "knownEstimatedCostWeight": 0,
+          "preferredNeuralEngineCostShare": null,
+          "significantFallbackOperations": [],
+          "allSignificantFallbacksExplained": true,
+          "aneFriendly": false,
+          "error": null
+        }
+      ],
+      "performance": {
+        "measurementCount": 30,
+        "timingsMilliseconds": {
+          "decode": {
+            "p50": 138.89706134796143,
+            "p95": 142.0996904373169,
+            "count": 30
+          },
+          "detectionPostProcess": {
+            "p50": 161.20749711990356,
+            "p95": 165.24952054023743,
+            "count": 30
+          },
+          "detector": {
+            "p50": 18.541991710662842,
+            "p95": 20.079070329666138,
+            "count": 30
+          },
+          "endToEnd": {
+            "p50": 586.5300297737122,
+            "p95": 595.4131305217743,
+            "count": 30
+          },
+          "preprocessing": {
+            "p50": 261.43085956573486,
+            "p95": 266.72195196151733,
+            "count": 30
+          },
+          "recognizer": {
+            "p50": 5.010545253753662,
+            "p95": 5.143231153488159,
+            "count": 30
+          },
+          "recognizerPerLine": {
+            "p50": 5.010545253753662,
+            "p95": 5.143231153488159,
+            "count": 30
+          }
+        },
+        "processLifetimePeakResidentBytes": 178257920,
+        "thermalStates": [
+          "fair"
+        ],
+        "energy": {
+          "source": "notMeasured"
+        },
+        "coreMLInferenceFraction": 0.04039521179202157,
+        "optimizationFocus": "cpuPreAndPostProcessing"
+      }
+    },
+    {
+      "run": {
+        "availableComputeDevices": [
+          "cpu",
+          "gpu",
+          "neuralEngine"
+        ],
+        "candidate": "small-rec320",
+        "candidateKind": "shape",
+        "coldCompileMilliseconds": 319.4969892501831,
+        "coldLoadMilliseconds": 2171.239972114563,
+        "computeUnits": "cpuAndNeuralEngine",
+        "device": "iPhone",
+        "deviceLabel": "iPhone 12",
+        "energy": {
+          "source": "notMeasured"
+        },
+        "evidenceClass": "localPhysical",
+        "hardwareGroup": "A14-A16",
+        "hardwareIdentifier": "iPhone13,2",
+        "measurementRunsPerSample": 30,
+        "operatingSystem": "Version 18.4 (Build 22E5232a)",
+        "parentCandidate": "B1",
+        "processLifetimePeakResidentBytes": 178913280,
+        "residentMemoryBytesEnd": 164020224,
+        "residentMemoryBytesStart": 164118528,
+        "systemVersion": "18.4",
+        "thermalStateEnd": "fair",
+        "thermalStateStart": "fair",
+        "tier": "small",
+        "warmupRuns": 3
+      },
+      "placement": [
+        {
+          "component": "detector",
+          "status": "available",
+          "operationCount": 879,
+          "operationsWithoutDeviceUsage": 686,
+          "neuralEngineUnsupportedOperations": 3,
+          "weightedOperationsWithoutDeviceUsage": 0,
+          "weightedNeuralEngineUnsupportedOperations": 3,
+          "knownEstimatedCostWeight": 1.0000000000000009,
+          "preferredNeuralEngineCostShare": 0.903465482201169,
+          "significantFallbackOperations": [],
+          "allSignificantFallbacksExplained": true,
+          "aneFriendly": null,
+          "error": null
+        },
+        {
+          "component": "recognizer",
+          "status": "available",
+          "operationCount": 779,
+          "operationsWithoutDeviceUsage": 584,
+          "neuralEngineUnsupportedOperations": 2,
+          "weightedOperationsWithoutDeviceUsage": 0,
+          "weightedNeuralEngineUnsupportedOperations": 0,
+          "knownEstimatedCostWeight": 0,
+          "preferredNeuralEngineCostShare": null,
+          "significantFallbackOperations": [],
+          "allSignificantFallbacksExplained": true,
+          "aneFriendly": null,
+          "error": null
+        }
+      ],
+      "performance": {
+        "measurementCount": 30,
+        "timingsMilliseconds": {
+          "decode": {
+            "p50": 140.59096574783325,
+            "p95": 144.03597712516785,
+            "count": 30
+          },
+          "detectionPostProcess": {
+            "p50": 161.51195764541626,
+            "p95": 165.5595600605011,
+            "count": 30
+          },
+          "detector": {
+            "p50": 18.8329815864563,
+            "p95": 21.0016667842865,
+            "count": 30
+          },
+          "endToEnd": {
+            "p50": 590.9590125083923,
+            "p95": 597.4153161048889,
+            "count": 30
+          },
+          "preprocessing": {
+            "p50": 262.1510624885559,
+            "p95": 267.9417371749878,
+            "count": 30
+          },
+          "recognizer": {
+            "p50": 5.143523216247559,
+            "p95": 5.611753463745117,
+            "count": 30
+          },
+          "recognizerPerLine": {
+            "p50": 5.143523216247559,
+            "p95": 5.611753463745117,
+            "count": 30
+          }
+        },
+        "processLifetimePeakResidentBytes": 178913280,
+        "thermalStates": [
+          "fair"
+        ],
+        "energy": {
+          "source": "notMeasured"
+        },
+        "coreMLInferenceFraction": 0.04081932635092881,
+        "optimizationFocus": "cpuPreAndPostProcessing"
+      }
+    }
+  ],
+  "pairedComputeUnitComparisons": [
+    {
+      "candidate": "B1",
+      "tier": "medium",
+      "hardwareGroup": "A17Pro-A19",
+      "deviceLabel": "iPhone 16 Pro",
+      "hardwareIdentifier": "iPhone17,1",
+      "evidenceClass": "localPhysical",
+      "baselineComputeUnits": "all",
+      "candidateComputeUnits": "cpuAndNeuralEngine",
+      "relativeChanges": {
+        "timingsMilliseconds.endToEnd.p50": 0.038562613231564985,
+        "timingsMilliseconds.endToEnd.p95": 0.0211394015464902,
+        "timingsMilliseconds.detectionPostProcess.p50": 0.028913899670763514,
+        "timingsMilliseconds.detectionPostProcess.p95": 0.026383964549618416,
+        "timingsMilliseconds.detector.p50": 0.13076287634308711,
+        "timingsMilliseconds.detector.p95": 0.009839125872367894,
+        "timingsMilliseconds.recognizerPerLine.p50": 0.08229924879657545,
+        "timingsMilliseconds.recognizerPerLine.p95": 0.23987771459732504,
+        "timingsMilliseconds.preprocessing.p50": 0.02000607494475423,
+        "timingsMilliseconds.preprocessing.p95": 0.01702990199855634,
+        "timingsMilliseconds.recognizer.p50": 0.08229924879657545,
+        "timingsMilliseconds.recognizer.p95": 0.23987771459732504,
+        "timingsMilliseconds.decode.p50": 0.019889209891595323,
+        "timingsMilliseconds.decode.p95": 0.024532111661523835,
+        "processLifetimePeakResidentBytes": -0.01934659609417777
+      },
+      "hasRequiredBenefit": false,
+      "regressionsOverTenPercent": {
+        "timingsMilliseconds.detector.p50": 0.13076287634308711,
+        "timingsMilliseconds.recognizer.p95": 0.23987771459732504,
+        "timingsMilliseconds.recognizerPerLine.p95": 0.23987771459732504
+      },
+      "ocrOutputsIdentical": true,
+      "baselineThermalStates": [
+        "fair"
+      ],
+      "candidateThermalStates": [
+        "fair"
+      ],
+      "thermalEvidenceValid": true,
+      "eligibleForProduction": false
+    },
+    {
+      "candidate": "B1",
+      "tier": "small",
+      "hardwareGroup": "A12-A13",
+      "deviceLabel": "iPhone XR",
+      "hardwareIdentifier": "iPhone11,8",
+      "evidenceClass": "localPhysical",
+      "baselineComputeUnits": "all",
+      "candidateComputeUnits": "cpuAndNeuralEngine",
+      "relativeChanges": {
+        "timingsMilliseconds.endToEnd.p50": 0.45608514914993,
+        "timingsMilliseconds.endToEnd.p95": 0.4024714336267929,
+        "timingsMilliseconds.detectionPostProcess.p50": 0.4301267757417067,
+        "timingsMilliseconds.detectionPostProcess.p95": 0.5707403829444381,
+        "timingsMilliseconds.detector.p50": 0.10844692648583514,
+        "timingsMilliseconds.detector.p95": 0.09968229646187521,
+        "timingsMilliseconds.recognizerPerLine.p50": 0.9354390891901164,
+        "timingsMilliseconds.recognizerPerLine.p95": 1.2106566569598582,
+        "timingsMilliseconds.preprocessing.p50": 0.4730134468648616,
+        "timingsMilliseconds.preprocessing.p95": 0.42930678859014976,
+        "timingsMilliseconds.recognizer.p50": 0.9354390891901164,
+        "timingsMilliseconds.recognizer.p95": 1.2106566569598582,
+        "timingsMilliseconds.decode.p50": 0.4222878410576484,
+        "timingsMilliseconds.decode.p95": 0.45307226671636175,
+        "processLifetimePeakResidentBytes": 0.16860260471664906
+      },
+      "hasRequiredBenefit": false,
+      "regressionsOverTenPercent": {
+        "processLifetimePeakResidentBytes": 0.16860260471664906,
+        "timingsMilliseconds.decode.p50": 0.4222878410576484,
+        "timingsMilliseconds.decode.p95": 0.45307226671636175,
+        "timingsMilliseconds.detectionPostProcess.p50": 0.4301267757417067,
+        "timingsMilliseconds.detectionPostProcess.p95": 0.5707403829444381,
+        "timingsMilliseconds.detector.p50": 0.10844692648583514,
+        "timingsMilliseconds.endToEnd.p50": 0.45608514914993,
+        "timingsMilliseconds.endToEnd.p95": 0.4024714336267929,
+        "timingsMilliseconds.preprocessing.p50": 0.4730134468648616,
+        "timingsMilliseconds.preprocessing.p95": 0.42930678859014976,
+        "timingsMilliseconds.recognizer.p50": 0.9354390891901164,
+        "timingsMilliseconds.recognizer.p95": 1.2106566569598582,
+        "timingsMilliseconds.recognizerPerLine.p50": 0.9354390891901164,
+        "timingsMilliseconds.recognizerPerLine.p95": 1.2106566569598582
+      },
+      "ocrOutputsIdentical": true,
+      "baselineThermalStates": [
+        "fair",
+        "serious"
+      ],
+      "candidateThermalStates": [
+        "serious"
+      ],
+      "thermalEvidenceValid": false,
+      "eligibleForProduction": false
+    },
+    {
+      "candidate": "B1",
+      "tier": "small",
+      "hardwareGroup": "A14-A16",
+      "deviceLabel": "iPhone 12",
+      "hardwareIdentifier": "iPhone13,2",
+      "evidenceClass": "localPhysical",
+      "baselineComputeUnits": "all",
+      "candidateComputeUnits": "cpuAndNeuralEngine",
+      "relativeChanges": {
+        "timingsMilliseconds.endToEnd.p50": 0.041357676484070655,
+        "timingsMilliseconds.endToEnd.p95": 0.047411222672250404,
+        "timingsMilliseconds.detectionPostProcess.p50": 0.029555543156750505,
+        "timingsMilliseconds.detectionPostProcess.p95": 0.03573112008021332,
+        "timingsMilliseconds.detector.p50": 0.003132726141674509,
+        "timingsMilliseconds.detector.p95": -0.00040441888822683586,
+        "timingsMilliseconds.recognizerPerLine.p50": -0.007366332769611032,
+        "timingsMilliseconds.recognizerPerLine.p95": -0.016120486715273864,
+        "timingsMilliseconds.preprocessing.p50": 0.055432790998344895,
+        "timingsMilliseconds.preprocessing.p95": 0.0496991017703099,
+        "timingsMilliseconds.recognizer.p50": -0.007366332769611032,
+        "timingsMilliseconds.recognizer.p95": -0.016120486715273864,
+        "timingsMilliseconds.decode.p50": 0.03459882385466997,
+        "timingsMilliseconds.decode.p95": 0.058562098992513974,
+        "processLifetimePeakResidentBytes": 0.043728206578079354
+      },
+      "hasRequiredBenefit": false,
+      "regressionsOverTenPercent": {},
+      "ocrOutputsIdentical": true,
+      "baselineThermalStates": [
+        "nominal"
+      ],
+      "candidateThermalStates": [
+        "nominal"
+      ],
+      "thermalEvidenceValid": true,
+      "eligibleForProduction": false
+    },
+    {
+      "candidate": "B1",
+      "tier": "small",
+      "hardwareGroup": "A17Pro-A19",
+      "deviceLabel": "iPhone 16 Pro",
+      "hardwareIdentifier": "iPhone17,1",
+      "evidenceClass": "localPhysical",
+      "baselineComputeUnits": "all",
+      "candidateComputeUnits": "cpuAndNeuralEngine",
+      "relativeChanges": {
+        "timingsMilliseconds.endToEnd.p50": 0.021180243373923276,
+        "timingsMilliseconds.endToEnd.p95": 0.026494324578480985,
+        "timingsMilliseconds.detectionPostProcess.p50": 0.023861213864409727,
+        "timingsMilliseconds.detectionPostProcess.p95": 0.022638700103093462,
+        "timingsMilliseconds.detector.p50": -0.016867202045182984,
+        "timingsMilliseconds.detector.p95": 0.09064414446156484,
+        "timingsMilliseconds.recognizerPerLine.p50": 0.029104097353355514,
+        "timingsMilliseconds.recognizerPerLine.p95": 0.10347054698288205,
+        "timingsMilliseconds.preprocessing.p50": 0.018621558178884414,
+        "timingsMilliseconds.preprocessing.p95": 0.04450831652729041,
+        "timingsMilliseconds.recognizer.p50": 0.029104097353355514,
+        "timingsMilliseconds.recognizer.p95": 0.10347054698288205,
+        "timingsMilliseconds.decode.p50": 0.009005583593392309,
+        "timingsMilliseconds.decode.p95": 0.01881250017586318,
+        "processLifetimePeakResidentBytes": -0.012278426286208387
+      },
+      "hasRequiredBenefit": false,
+      "regressionsOverTenPercent": {
+        "timingsMilliseconds.recognizer.p95": 0.10347054698288205,
+        "timingsMilliseconds.recognizerPerLine.p95": 0.10347054698288205
+      },
+      "ocrOutputsIdentical": true,
+      "baselineThermalStates": [
+        "nominal"
+      ],
+      "candidateThermalStates": [
+        "nominal"
+      ],
+      "thermalEvidenceValid": true,
+      "eligibleForProduction": false
+    },
+    {
+      "candidate": "B1",
+      "tier": "tiny",
+      "hardwareGroup": "A17Pro-A19",
+      "deviceLabel": "iPhone 16 Pro",
+      "hardwareIdentifier": "iPhone17,1",
+      "evidenceClass": "localPhysical",
+      "baselineComputeUnits": "all",
+      "candidateComputeUnits": "cpuAndNeuralEngine",
+      "relativeChanges": {
+        "timingsMilliseconds.endToEnd.p50": -0.021309686989686136,
+        "timingsMilliseconds.endToEnd.p95": 0.08582108536930513,
+        "timingsMilliseconds.detectionPostProcess.p50": -0.014478914260477219,
+        "timingsMilliseconds.detectionPostProcess.p95": 0.019719079976838486,
+        "timingsMilliseconds.detector.p50": -0.010027145582941559,
+        "timingsMilliseconds.detector.p95": 0.013570743312651838,
+        "timingsMilliseconds.recognizerPerLine.p50": 0.03355872777360381,
+        "timingsMilliseconds.recognizerPerLine.p95": 0.0492178234596479,
+        "timingsMilliseconds.preprocessing.p50": -0.02673121028965544,
+        "timingsMilliseconds.preprocessing.p95": 0.001431984750734915,
+        "timingsMilliseconds.recognizer.p50": 0.03355872777360381,
+        "timingsMilliseconds.recognizer.p95": 0.0492178234596479,
+        "timingsMilliseconds.decode.p50": -0.01150086044566295,
+        "timingsMilliseconds.decode.p95": -0.024078998814560645,
+        "processLifetimePeakResidentBytes": -0.009443962609617423
+      },
+      "hasRequiredBenefit": false,
+      "regressionsOverTenPercent": {},
+      "ocrOutputsIdentical": true,
+      "baselineThermalStates": [
+        "nominal"
+      ],
+      "candidateThermalStates": [
+        "nominal"
+      ],
+      "thermalEvidenceValid": true,
+      "eligibleForProduction": false
+    },
+    {
+      "candidate": "small-rec320",
+      "tier": "small",
+      "hardwareGroup": "A12-A13",
+      "deviceLabel": "iPhone XR",
+      "hardwareIdentifier": "iPhone11,8",
+      "evidenceClass": "localPhysical",
+      "baselineComputeUnits": "all",
+      "candidateComputeUnits": "cpuAndNeuralEngine",
+      "relativeChanges": {
+        "timingsMilliseconds.endToEnd.p50": 0.0852184315398618,
+        "timingsMilliseconds.endToEnd.p95": -0.05238078887312236,
+        "timingsMilliseconds.detectionPostProcess.p50": 0.05272869873461498,
+        "timingsMilliseconds.detectionPostProcess.p95": -0.12413199341510618,
+        "timingsMilliseconds.detector.p50": 0.021790328046826086,
+        "timingsMilliseconds.detector.p95": 0.03139802333938625,
+        "timingsMilliseconds.recognizerPerLine.p50": 0.15468354959359787,
+        "timingsMilliseconds.recognizerPerLine.p95": 0.38790441176470586,
+        "timingsMilliseconds.preprocessing.p50": 0.10495952465792098,
+        "timingsMilliseconds.preprocessing.p95": -0.049170725478316746,
+        "timingsMilliseconds.recognizer.p50": 0.15468354959359787,
+        "timingsMilliseconds.recognizer.p95": 0.38790441176470586,
+        "timingsMilliseconds.decode.p50": 0.055215623156807295,
+        "timingsMilliseconds.decode.p95": 0.029130717146820858,
+        "processLifetimePeakResidentBytes": -0.0893111156269051
+      },
+      "hasRequiredBenefit": false,
+      "regressionsOverTenPercent": {
+        "timingsMilliseconds.preprocessing.p50": 0.10495952465792098,
+        "timingsMilliseconds.recognizer.p50": 0.15468354959359787,
+        "timingsMilliseconds.recognizer.p95": 0.38790441176470586,
+        "timingsMilliseconds.recognizerPerLine.p50": 0.15468354959359787,
+        "timingsMilliseconds.recognizerPerLine.p95": 0.38790441176470586
+      },
+      "ocrOutputsIdentical": true,
+      "baselineThermalStates": [
+        "serious"
+      ],
+      "candidateThermalStates": [
+        "serious"
+      ],
+      "thermalEvidenceValid": false,
+      "eligibleForProduction": false
+    },
+    {
+      "candidate": "small-rec320",
+      "tier": "small",
+      "hardwareGroup": "A14-A16",
+      "deviceLabel": "iPhone 12",
+      "hardwareIdentifier": "iPhone13,2",
+      "evidenceClass": "localPhysical",
+      "baselineComputeUnits": "all",
+      "candidateComputeUnits": "cpuAndNeuralEngine",
+      "relativeChanges": {
+        "timingsMilliseconds.endToEnd.p50": 0.007551161082730771,
+        "timingsMilliseconds.endToEnd.p95": 0.0033626829515164746,
+        "timingsMilliseconds.detectionPostProcess.p50": 0.0018886251008924382,
+        "timingsMilliseconds.detectionPostProcess.p95": 0.0018761901350762395,
+        "timingsMilliseconds.detector.p50": 0.01569356088246545,
+        "timingsMilliseconds.detector.p95": 0.045948165899755665,
+        "timingsMilliseconds.recognizerPerLine.p50": 0.02653961909520241,
+        "timingsMilliseconds.recognizerPerLine.p95": 0.09109493551329194,
+        "timingsMilliseconds.preprocessing.p50": 0.002754850456512213,
+        "timingsMilliseconds.preprocessing.p95": 0.004573246425725205,
+        "timingsMilliseconds.recognizer.p50": 0.02653961909520241,
+        "timingsMilliseconds.recognizer.p95": 0.09109493551329194,
+        "timingsMilliseconds.decode.p50": 0.012195394081292329,
+        "timingsMilliseconds.decode.p95": 0.0136262554963488,
+        "processLifetimePeakResidentBytes": 0.003676470588235294
+      },
+      "hasRequiredBenefit": false,
+      "regressionsOverTenPercent": {},
+      "ocrOutputsIdentical": true,
+      "baselineThermalStates": [
+        "fair"
+      ],
+      "candidateThermalStates": [
+        "fair"
+      ],
+      "thermalEvidenceValid": true,
+      "eligibleForProduction": false
+    },
+    {
+      "candidate": "small-rec320",
+      "tier": "small",
+      "hardwareGroup": "A17Pro-A19",
+      "deviceLabel": "iPhone 16 Pro",
+      "hardwareIdentifier": "iPhone17,1",
+      "evidenceClass": "localPhysical",
+      "baselineComputeUnits": "all",
+      "candidateComputeUnits": "cpuAndNeuralEngine",
+      "relativeChanges": {
+        "timingsMilliseconds.endToEnd.p50": 0.011981704048061642,
+        "timingsMilliseconds.endToEnd.p95": 0.008201697260346029,
+        "timingsMilliseconds.detectionPostProcess.p50": 0.016148233509114485,
+        "timingsMilliseconds.detectionPostProcess.p95": 0.021438969343738536,
+        "timingsMilliseconds.detector.p50": 0.08676160535418183,
+        "timingsMilliseconds.detector.p95": 0.03335544087497487,
+        "timingsMilliseconds.recognizerPerLine.p50": -0.002982344520439001,
+        "timingsMilliseconds.recognizerPerLine.p95": -0.029135555269129424,
+        "timingsMilliseconds.preprocessing.p50": 0.0061464201114262654,
+        "timingsMilliseconds.preprocessing.p95": 0.006156614151616152,
+        "timingsMilliseconds.recognizer.p50": -0.002982344520439001,
+        "timingsMilliseconds.recognizer.p95": -0.029135555269129424,
+        "timingsMilliseconds.decode.p50": 0.02207372201929262,
+        "timingsMilliseconds.decode.p95": 0.0394781697542974,
+        "processLifetimePeakResidentBytes": -0.013390928725701945
+      },
+      "hasRequiredBenefit": false,
+      "regressionsOverTenPercent": {},
+      "ocrOutputsIdentical": true,
+      "baselineThermalStates": [
+        "fair"
+      ],
+      "candidateThermalStates": [
+        "fair"
+      ],
+      "thermalEvidenceValid": true,
+      "eligibleForProduction": false
+    }
+  ],
+  "pairedCandidateComparisons": [
+    {
+      "baselineCandidate": "B1",
+      "candidate": "small-rec320",
+      "candidateKind": "shape",
+      "tier": "small",
+      "hardwareGroup": "A17Pro-A19",
+      "deviceLabel": "iPhone 16 Pro",
+      "hardwareIdentifier": "iPhone17,1",
+      "evidenceClass": "localPhysical",
+      "computeUnits": "all",
+      "relativeChanges": {
+        "timingsMilliseconds.endToEnd.p50": 0.04073440311792628,
+        "timingsMilliseconds.endToEnd.p95": 0.04720210989422893,
+        "timingsMilliseconds.detectionPostProcess.p50": 0.06043730661053704,
+        "timingsMilliseconds.detectionPostProcess.p95": 0.06955173575054197,
+        "timingsMilliseconds.detector.p50": -0.07411704226526246,
+        "timingsMilliseconds.detector.p95": 0.008951583325518866,
+        "timingsMilliseconds.recognizerPerLine.p50": -0.2462308545394599,
+        "timingsMilliseconds.recognizerPerLine.p95": -0.19601444996855036,
+        "timingsMilliseconds.preprocessing.p50": 0.04624093050678398,
+        "timingsMilliseconds.preprocessing.p95": 0.06189380163906704,
+        "timingsMilliseconds.recognizer.p50": -0.2462308545394599,
+        "timingsMilliseconds.recognizer.p95": -0.19601444996855036,
+        "timingsMilliseconds.decode.p50": 0.036960388588629677,
+        "timingsMilliseconds.decode.p95": 0.05388997845899855,
+        "processLifetimePeakResidentBytes": 0.0008646779074794639
+      },
+      "hasRequiredBenefit": false,
+      "regressionsOverTenPercent": {},
+      "ocrOutputsIdentical": true,
+      "baselineThermalStates": [
+        "nominal"
+      ],
+      "candidateThermalStates": [
+        "fair"
+      ],
+      "thermalEvidenceValid": false,
+      "qualityDecision": "notProvided"
+    },
+    {
+      "baselineCandidate": "B1",
+      "candidate": "small-rec320",
+      "candidateKind": "shape",
+      "tier": "small",
+      "hardwareGroup": "A17Pro-A19",
+      "deviceLabel": "iPhone 16 Pro",
+      "hardwareIdentifier": "iPhone17,1",
+      "evidenceClass": "localPhysical",
+      "computeUnits": "cpuAndNeuralEngine",
+      "relativeChanges": {
+        "timingsMilliseconds.endToEnd.p50": 0.03135972475240294,
+        "timingsMilliseconds.endToEnd.p95": 0.028540459786298746,
+        "timingsMilliseconds.detectionPostProcess.p50": 0.052448790195271766,
+        "timingsMilliseconds.detectionPostProcess.p95": 0.0682969679464563,
+        "timingsMilliseconds.detector.p50": 0.023477247032221593,
+        "timingsMilliseconds.detector.p95": -0.044046022249021724,
+        "timingsMilliseconds.recognizerPerLine.p50": -0.26973262655094077,
+        "timingsMilliseconds.recognizerPerLine.p95": -0.29263088467821546,
+        "timingsMilliseconds.preprocessing.p50": 0.03342753582148723,
+        "timingsMilliseconds.preprocessing.p95": 0.022903748242042964,
+        "timingsMilliseconds.recognizer.p50": -0.26973262655094077,
+        "timingsMilliseconds.recognizer.p95": -0.29263088467821546,
+        "timingsMilliseconds.decode.p50": 0.05039058374373638,
+        "timingsMilliseconds.decode.p95": 0.07526716225199026,
+        "processLifetimePeakResidentBytes": -0.00026262803116519303
+      },
+      "hasRequiredBenefit": false,
+      "regressionsOverTenPercent": {},
+      "ocrOutputsIdentical": true,
+      "baselineThermalStates": [
+        "nominal"
+      ],
+      "candidateThermalStates": [
+        "fair"
+      ],
+      "thermalEvidenceValid": false,
+      "qualityDecision": "notProvided"
+    },
+    {
+      "baselineCandidate": "B1",
+      "candidate": "small-rec320",
+      "candidateKind": "shape",
+      "tier": "small",
+      "hardwareGroup": "A12-A13",
+      "deviceLabel": "iPhone XR",
+      "hardwareIdentifier": "iPhone11,8",
+      "evidenceClass": "localPhysical",
+      "computeUnits": "all",
+      "relativeChanges": {
+        "timingsMilliseconds.endToEnd.p50": 0.2934618267342086,
+        "timingsMilliseconds.endToEnd.p95": 0.4467388745272108,
+        "timingsMilliseconds.detectionPostProcess.p50": 0.33581863614127455,
+        "timingsMilliseconds.detectionPostProcess.p95": 0.7181761415817265,
+        "timingsMilliseconds.detector.p50": 0.06487119652813246,
+        "timingsMilliseconds.detector.p95": 0.07284719395732078,
+        "timingsMilliseconds.recognizerPerLine.p50": -0.2363270809564461,
+        "timingsMilliseconds.recognizerPerLine.p95": -0.19697408301334096,
+        "timingsMilliseconds.preprocessing.p50": 0.2898257187165923,
+        "timingsMilliseconds.preprocessing.p95": 0.4994516989044522,
+        "timingsMilliseconds.recognizer.p50": -0.2363270809564461,
+        "timingsMilliseconds.recognizer.p95": -0.19697408301334096,
+        "timingsMilliseconds.decode.p50": 0.33081927609906514,
+        "timingsMilliseconds.decode.p95": 0.39794421362734667,
+        "processLifetimePeakResidentBytes": 0.15475771441980524
+      },
+      "hasRequiredBenefit": false,
+      "regressionsOverTenPercent": {
+        "processLifetimePeakResidentBytes": 0.15475771441980524,
+        "timingsMilliseconds.decode.p50": 0.33081927609906514,
+        "timingsMilliseconds.decode.p95": 0.39794421362734667,
+        "timingsMilliseconds.detectionPostProcess.p50": 0.33581863614127455,
+        "timingsMilliseconds.detectionPostProcess.p95": 0.7181761415817265,
+        "timingsMilliseconds.endToEnd.p50": 0.2934618267342086,
+        "timingsMilliseconds.endToEnd.p95": 0.4467388745272108,
+        "timingsMilliseconds.preprocessing.p50": 0.2898257187165923,
+        "timingsMilliseconds.preprocessing.p95": 0.4994516989044522
+      },
+      "ocrOutputsIdentical": true,
+      "baselineThermalStates": [
+        "fair",
+        "serious"
+      ],
+      "candidateThermalStates": [
+        "serious"
+      ],
+      "thermalEvidenceValid": false,
+      "qualityDecision": "notProvided"
+    },
+    {
+      "baselineCandidate": "B1",
+      "candidate": "small-rec320",
+      "candidateKind": "shape",
+      "tier": "small",
+      "hardwareGroup": "A12-A13",
+      "deviceLabel": "iPhone XR",
+      "hardwareIdentifier": "iPhone11,8",
+      "evidenceClass": "localPhysical",
+      "computeUnits": "cpuAndNeuralEngine",
+      "relativeChanges": {
+        "timingsMilliseconds.endToEnd.p50": -0.03598452625887777,
+        "timingsMilliseconds.endToEnd.p95": -0.022470249222285864,
+        "timingsMilliseconds.detectionPostProcess.p50": -0.016692339152152305,
+        "timingsMilliseconds.detectionPostProcess.p95": -0.04191963966196453,
+        "timingsMilliseconds.detector.p50": -0.01837872140827194,
+        "timingsMilliseconds.detector.p95": 0.006229234346094671,
+        "timingsMilliseconds.recognizerPerLine.p50": -0.5443925041016382,
+        "timingsMilliseconds.recognizerPerLine.p95": -0.49584065465873906,
+        "timingsMilliseconds.preprocessing.p50": -0.03245607426189402,
+        "timingsMilliseconds.preprocessing.p95": -0.0025076614545848906,
+        "timingsMilliseconds.recognizer.p50": -0.5443925041016382,
+        "timingsMilliseconds.recognizer.p95": -0.49584065465873906,
+        "timingsMilliseconds.decode.p50": -0.012646209016528558,
+        "timingsMilliseconds.decode.p95": -0.009913433725738977,
+        "processLifetimePeakResidentBytes": -0.1001004016064257
+      },
+      "hasRequiredBenefit": false,
+      "regressionsOverTenPercent": {},
+      "ocrOutputsIdentical": true,
+      "baselineThermalStates": [
+        "serious"
+      ],
+      "candidateThermalStates": [
+        "serious"
+      ],
+      "thermalEvidenceValid": false,
+      "qualityDecision": "notProvided"
+    },
+    {
+      "baselineCandidate": "B1",
+      "candidate": "small-rec320",
+      "candidateKind": "shape",
+      "tier": "small",
+      "hardwareGroup": "A14-A16",
+      "deviceLabel": "iPhone 12",
+      "hardwareIdentifier": "iPhone13,2",
+      "evidenceClass": "localPhysical",
+      "computeUnits": "all",
+      "relativeChanges": {
+        "timingsMilliseconds.endToEnd.p50": 0.0656354546288398,
+        "timingsMilliseconds.endToEnd.p95": 0.059240755926184135,
+        "timingsMilliseconds.detectionPostProcess.p50": 0.055264768895161125,
+        "timingsMilliseconds.detectionPostProcess.p95": 0.04914689336859619,
+        "timingsMilliseconds.detector.p50": -0.007598934490293972,
+        "timingsMilliseconds.detector.p95": -0.01846574312699132,
+        "timingsMilliseconds.recognizerPerLine.p50": 0.36696695720046835,
+        "timingsMilliseconds.recognizerPerLine.p95": 0.2988069936722199,
+        "timingsMilliseconds.preprocessing.p50": 0.0793092943378416,
+        "timingsMilliseconds.preprocessing.p95": 0.06136563976436677,
+        "timingsMilliseconds.recognizer.p50": 0.36696695720046835,
+        "timingsMilliseconds.recognizer.p95": 0.2988069936722199,
+        "timingsMilliseconds.decode.p50": 0.05099260658394231,
+        "timingsMilliseconds.decode.p95": 0.058821737217780556,
+        "processLifetimePeakResidentBytes": 0.025351050796343418
+      },
+      "hasRequiredBenefit": false,
+      "regressionsOverTenPercent": {
+        "timingsMilliseconds.recognizer.p50": 0.36696695720046835,
+        "timingsMilliseconds.recognizer.p95": 0.2988069936722199,
+        "timingsMilliseconds.recognizerPerLine.p50": 0.36696695720046835,
+        "timingsMilliseconds.recognizerPerLine.p95": 0.2988069936722199
+      },
+      "ocrOutputsIdentical": true,
+      "baselineThermalStates": [
+        "nominal"
+      ],
+      "candidateThermalStates": [
+        "fair"
+      ],
+      "thermalEvidenceValid": false,
+      "qualityDecision": "notProvided"
+    },
+    {
+      "baselineCandidate": "B1",
+      "candidate": "small-rec320",
+      "candidateKind": "shape",
+      "tier": "small",
+      "hardwareGroup": "A14-A16",
+      "deviceLabel": "iPhone 12",
+      "hardwareIdentifier": "iPhone13,2",
+      "evidenceClass": "localPhysical",
+      "computeUnits": "cpuAndNeuralEngine",
+      "relativeChanges": {
+        "timingsMilliseconds.endToEnd.p50": 0.031040788240288164,
+        "timingsMilliseconds.endToEnd.p95": 0.01469472901595434,
+        "timingsMilliseconds.detectionPostProcess.p50": 0.026906975007967876,
+        "timingsMilliseconds.detectionPostProcess.p95": 0.014853442212661789,
+        "timingsMilliseconds.detector.p50": 0.00482752260317319,
+        "timingsMilliseconds.detector.p95": 0.027049313885778897,
+        "timingsMilliseconds.recognizerPerLine.p50": 0.4136592238258277,
+        "timingsMilliseconds.recognizerPerLine.p95": 0.44034072655286677,
+        "timingsMilliseconds.preprocessing.p50": 0.02543964833262727,
+        "timingsMilliseconds.preprocessing.p95": 0.015738247831816973,
+        "timingsMilliseconds.recognizer.p50": 0.4136592238258277,
+        "timingsMilliseconds.recognizer.p95": 0.44034072655286677,
+        "timingsMilliseconds.decode.p50": 0.028234182244915664,
+        "timingsMilliseconds.decode.p95": 0.013874872107798577,
+        "processLifetimePeakResidentBytes": -0.01399548532731377
+      },
+      "hasRequiredBenefit": false,
+      "regressionsOverTenPercent": {
+        "timingsMilliseconds.recognizer.p50": 0.4136592238258277,
+        "timingsMilliseconds.recognizer.p95": 0.44034072655286677,
+        "timingsMilliseconds.recognizerPerLine.p50": 0.4136592238258277,
+        "timingsMilliseconds.recognizerPerLine.p95": 0.44034072655286677
+      },
+      "ocrOutputsIdentical": true,
+      "baselineThermalStates": [
+        "nominal"
+      ],
+      "candidateThermalStates": [
+        "fair"
+      ],
+      "thermalEvidenceValid": false,
+      "qualityDecision": "notProvided"
+    }
+  ],
+  "w8a8Decision": {
+    "decision": "notEligible",
+    "coveredHardwareGroups": [],
+    "missingHardwareGroups": [
+      "A12-A13",
+      "A14-A16",
+      "A17Pro-A19"
+    ],
+    "qualityGatePass": false,
+    "modernBenefitGatePass": false,
+    "legacyRegressionGatePass": false
+  },
+  "productionComputeUnitsDecision": {
+    "decision": "keepAll",
+    "coveredHardwareGroups": [
+      "A14-A16",
+      "A17Pro-A19"
+    ],
+    "missingHardwareGroups": [
+      "A12-A13"
+    ],
+    "allSuppliedComparisonsPass": false
+  }
+}

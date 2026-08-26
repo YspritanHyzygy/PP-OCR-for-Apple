@@ -6,6 +6,7 @@ from scripts.evaluate_results import (
     graphemes,
     levenshtein,
     normalize_text,
+    score_report,
     score_sample,
 )
 
@@ -92,6 +93,17 @@ class TextMetricTests(unittest.TestCase):
         second = bootstrap_delta(baseline, candidate)
         self.assertEqual(first, second)
         self.assertGreaterEqual(first["lower95"], 0)
+
+    def test_schema_two_uses_every_raw_timing_measurement(self):
+        value = sample([line("Open")], [line("Open")])
+        value["measurements"] = [
+            {"timingsMilliseconds": {"endToEnd": 10}},
+            {"timingsMilliseconds": {"endToEnd": 30}},
+        ]
+        report, _ = score_report({"schemaVersion": 2, "samples": [value]})
+        timing = report["metrics"]["timingsMilliseconds"]["endToEnd"]
+        self.assertEqual(timing["count"], 2)
+        self.assertEqual(timing["p50"], 20)
 
 
 if __name__ == "__main__":

@@ -40,6 +40,7 @@ import onnx
 import onnxruntime as ort
 import torch
 import yaml
+from PIL import Image
 from onnx import helper, numpy_helper
 from onnx2torch import convert as onnx2torch_convert
 
@@ -65,7 +66,7 @@ REC_MEAN = [0.5, 0.5, 0.5]
 REC_STD = [0.5, 0.5, 0.5]
 FLOAT32 = 65568
 FLOAT16 = 65552
-VALID_COMPRESSIONS = {"none", "int8", "palette8", "palette6"}
+VALID_COMPRESSIONS = {"none", "int8", "palette8", "palette6", "w8a8"}
 VALID_IO_TYPES = {"FLOAT32", "FLOAT16"}
 RECIPE_NAME = re.compile(r"^[a-z0-9][a-z0-9-]*$")
 
@@ -112,6 +113,8 @@ def load_recipe(path: Path) -> dict[str, Any]:
                 raise SystemExit(f"{path}: {output_tier}.{component}Compression is invalid")
             if io_type not in VALID_IO_TYPES:
                 raise SystemExit(f"{path}: {output_tier}.{component}IOType is invalid")
+            if compression == "w8a8" and io_type != "FLOAT32":
+                raise SystemExit(f"{path}: W8A8 calibration currently requires Float32 I/O")
     return recipe
 
 
@@ -256,7 +259,11 @@ def assert_rewrite_is_exact(original: Path, rewritten: Path, shape: tuple[int, .
     print("     auto_pad rewrite is bit-exact")
 
 
-def apply_weight_compression(model: ct.models.MLModel, mode: str) -> ct.models.MLModel:
+def apply_compression(
+    model: ct.models.MLModel,
+    mode: str,
+    calibration_samples: list[dict[str, np.ndarray]] | None,
+) -> ct.models.MLModel:
     if mode == "none":
         return model
     if mode == "int8":
@@ -265,6 +272,20 @@ def apply_weight_compression(model: ct.models.MLModel, mode: str) -> ct.models.M
         )
         config = cto.coreml.OptimizationConfig(global_config=op_config)
         return cto.coreml.linear_quantize_weights(model, config=config)
+    if mode == "w8a8":
+        if not calibration_samples:
+            raise SystemExit("W8A8 requires real public calibration samples")
+        op_config = cto.coreml.OpLinearQuantizerConfig(mode="linear_symmetric")
+        config = cto.coreml.OptimizationConfig(global_config=op_config)
+        activated = cto.coreml.linear_quantize_activations(
+            model,
+            config=config,
+            sample_data=calibration_samples,
+            # PP-OCR programs contain hundreds of eligible operations. Smaller
+            # calibration groups keep the temporary output-expanded model bounded.
+            calibration_op_group_size=50,
+        )
+        return cto.coreml.linear_quantize_weights(activated, config=config)
     if mode in {"palette8", "palette6"}:
         bits = int(mode.removeprefix("palette"))
         op_config = cto.coreml.OpPalettizerConfig(
@@ -283,6 +304,35 @@ def protobuf_dtype(io_type: str) -> int:
     return FLOAT32 if io_type == "FLOAT32" else FLOAT16
 
 
+def operation_types(model: ct.models.MLModel) -> set[str]:
+    types: set[str] = set()
+
+    def visit(block: Any) -> None:
+        for operation in block.operations:
+            types.add(str(operation.op_type))
+            for child in operation.blocks:
+                visit(child)
+
+    for function in model._mil_program.functions.values():
+        visit(function)
+    return types
+
+
+def assert_compression_ops(model: ct.models.MLModel, mode: str, label: str) -> None:
+    if mode == "none":
+        return
+    types = operation_types(model)
+    weight_quantized = any(
+        name in types for name in ("constexpr_affine_dequantize", "constexpr_blockwise_shift_scale")
+    )
+    if mode in {"int8", "w8a8"} and not weight_quantized:
+        raise SystemExit(f"{label}: {mode} model has no quantized-weight operation")
+    if mode in {"palette8", "palette6"} and "constexpr_lut_to_dense" not in types:
+        raise SystemExit(f"{label}: palette model has no lookup-table operation")
+    if mode == "w8a8" and not {"quantize", "dequantize"} <= types:
+        raise SystemExit(f"{label}: W8A8 model has no activation quantize/dequantize pair")
+
+
 def to_coreml(
     onnx_path: Path,
     output: Path,
@@ -291,6 +341,7 @@ def to_coreml(
     label: str,
     compression: str,
     io_type: str,
+    calibration_samples: list[dict[str, np.ndarray]] | None = None,
     require_argmax_equal: bool = False,
 ) -> tuple[float, int]:
     torch_model = onnx2torch_convert(onnx.load(str(onnx_path)))
@@ -306,7 +357,8 @@ def to_coreml(
         compute_precision=ct.precision.FLOAT16,
         compute_units=ct.ComputeUnit.ALL,
     )
-    model = apply_weight_compression(model, compression)
+    model = apply_compression(model, compression, calibration_samples)
+    assert_compression_ops(model, compression, label)
     model.save(str(output))
 
     expected_type = protobuf_dtype(io_type)
@@ -318,6 +370,8 @@ def to_coreml(
     boundary_input = np.random.default_rng(1).random(shape).astype(boundary_dtype)
     reference = run_onnx(onnx_path, boundary_input.astype(np.float32))
     candidate = list(ct.models.MLModel(str(output)).predict({"x": boundary_input}).values())[0]
+    if not np.isfinite(reference).all() or not np.isfinite(candidate).all():
+        raise SystemExit(f"{label}: ONNX/Core ML output contains a non-finite value")
     if reference.shape != candidate.shape:
         raise SystemExit(f"{label}: ONNX {reference.shape} and Core ML {candidate.shape} differ")
     delta = float(np.abs(reference - candidate.astype(np.float32)).max())
@@ -334,6 +388,78 @@ def to_coreml(
     return delta, mismatches
 
 
+def load_calibration_corpus(path: Path | None) -> tuple[Path, dict[str, Any]] | None:
+    if path is None:
+        return None
+    document = json.loads(path.read_text(encoding="utf-8"))
+    if document.get("schemaVersion") != 1 or not isinstance(document.get("samples"), list):
+        raise SystemExit(f"{path}: calibration corpus must use schemaVersion 1")
+    if not document["samples"]:
+        raise SystemExit(f"{path}: calibration corpus is empty")
+    return path.resolve(), document
+
+
+def calibration_image(path: str, corpus_path: Path) -> Image.Image:
+    resolved = Path(path)
+    if not resolved.is_absolute():
+        resolved = corpus_path.parent / resolved
+    with Image.open(resolved) as image:
+        return image.convert("RGB")
+
+
+def calibration_samples(
+    corpus: tuple[Path, dict[str, Any]] | None,
+    component: str,
+    shape: tuple[int, ...],
+    contract: dict[str, Any],
+    maximum: int = 32,
+) -> list[dict[str, np.ndarray]] | None:
+    if corpus is None:
+        return None
+    corpus_path, document = corpus
+    output: list[dict[str, np.ndarray]] = []
+    height, width = shape[-2:]
+    for sample in document["samples"]:
+        image = calibration_image(sample["imagePath"], corpus_path)
+        if component == "detector":
+            ratio = min(width / image.width, height / image.height)
+            resized = image.resize(
+                (max(1, round(image.width * ratio)), max(1, round(image.height * ratio))),
+                Image.Resampling.LANCZOS,
+            )
+            canvas = Image.new("RGB", (width, height))
+            canvas.paste(resized, (0, 0))
+            values = np.asarray(canvas, dtype=np.float32) / 255
+            mean = np.asarray(list(reversed(contract["upstreamMean"])), dtype=np.float32)
+            std = np.asarray(list(reversed(contract["upstreamStd"])), dtype=np.float32)
+            tensor = ((values - mean) / std).transpose(2, 0, 1)[None]
+            output.append({"x": np.ascontiguousarray(tensor)})
+        else:
+            for line in sample.get("groundTruth", []):
+                if line.get("ignore", False):
+                    continue
+                points = line.get("polygon", [])
+                if len(points) < 3:
+                    continue
+                xs = [float(point[0]) for point in points]
+                ys = [float(point[1]) for point in points]
+                left, top = max(0, int(min(xs))), max(0, int(min(ys)))
+                right = min(image.width, max(left + 1, int(np.ceil(max(xs)))))
+                bottom = min(image.height, max(top + 1, int(np.ceil(max(ys)))))
+                crop = image.crop((left, top, right, bottom))
+                used = max(16, min(width, round(height * crop.width / crop.height)))
+                resized = crop.resize((used, height), Image.Resampling.BILINEAR)
+                tensor = np.zeros(shape, dtype=np.float32)
+                values = (np.asarray(resized, dtype=np.float32) / 255 - 0.5) / 0.5
+                tensor[0, :, :, :used] = values.transpose(2, 0, 1)
+                output.append({"x": tensor})
+                if len(output) >= maximum:
+                    return output
+        if len(output) >= maximum:
+            return output
+    return output
+
+
 def build_component(
     output_tier: str,
     component: str,
@@ -344,6 +470,7 @@ def build_component(
     shape: tuple[int, ...],
     compression: str,
     io_type: str,
+    calibration_corpus: tuple[Path, dict[str, Any]] | None,
 ) -> tuple[dict[str, Any], dict[str, Any]]:
     contract = read_source_contract(source_dir, component)
     component_work = work_dir / output_tier / component
@@ -360,6 +487,9 @@ def build_component(
 
     filename = "VertoTextDetector.mlpackage" if component == "detector" else "VertoTextRecognizer.mlpackage"
     tolerance = DET_TOLERANCE if component == "detector" else REC_TOLERANCE
+    samples = calibration_samples(
+        calibration_corpus, component, shape, contract
+    ) if compression == "w8a8" else None
     conversion_error, argmax_mismatches = to_coreml(
         fixed_onnx,
         output_dir / filename,
@@ -368,6 +498,7 @@ def build_component(
         f"{output_tier}.{component}",
         compression,
         io_type,
+        calibration_samples=samples,
         require_argmax_equal=component == "recognizer",
     )
     source = source_for(source_tier, component)
@@ -377,7 +508,9 @@ def build_component(
         "inputShape": list(shape),
         "inputOutputType": io_type,
         "computePrecision": "FLOAT16",
-        "weightCompression": compression,
+        "weightCompression": "int8" if compression == "w8a8" else compression,
+        "activationQuantization": "int8" if compression == "w8a8" else "none",
+        "calibrationSamples": len(samples or []),
         "rgbFoldMaxAbsoluteError": rgb_error,
         "conversionMaxAbsoluteError": conversion_error,
     }
@@ -393,6 +526,7 @@ def build_tier(
     sources_root: Path,
     work_root: Path,
     output_root: Path,
+    calibration_corpus: tuple[Path, dict[str, Any]] | None,
 ) -> dict[str, Any]:
     output = output_root / output_tier
     if output.exists():
@@ -431,6 +565,7 @@ def build_tier(
         detector_shape,
         config["detectorCompression"],
         config["detectorIOType"],
+        calibration_corpus,
     )
     recognizer_contract, recognizer_metadata = build_component(
         output_tier,
@@ -442,6 +577,7 @@ def build_tier(
         recognizer_shape,
         config["recognizerCompression"],
         config["recognizerIOType"],
+        calibration_corpus,
     )
 
     characters = recognizer_contract["characterDict"]
@@ -492,6 +628,11 @@ def main() -> None:
     parser.add_argument("--work", type=Path, default=Path("build"), help="intermediate directory")
     parser.add_argument("--recipe", type=Path, default=DEFAULT_RECIPE, help="versioned build recipe")
     parser.add_argument("--tier", action="append", choices=TIERS, help="build one or more tiers")
+    parser.add_argument(
+        "--calibration-corpus",
+        type=Path,
+        help="public schema-v1 corpus; required by a selected W8A8 component",
+    )
     args = parser.parse_args()
 
     recipe_path = args.recipe.resolve()
@@ -504,6 +645,13 @@ def main() -> None:
     output_root.mkdir(parents=True, exist_ok=True)
 
     selected = args.tier or list(TIERS)
+    selected_uses_w8a8 = any(
+        recipe["tiers"][tier][f"{component}Compression"] == "w8a8"
+        for tier in selected for component in COMPONENTS
+    )
+    if selected_uses_w8a8 and args.calibration_corpus is None:
+        raise SystemExit("the selected W8A8 recipe requires --calibration-corpus")
+    corpus = load_calibration_corpus(args.calibration_corpus)
     packs = [
         build_tier(
             tier,
@@ -512,6 +660,7 @@ def main() -> None:
             sources_root,
             recipe_work / "converted",
             output_root,
+            corpus,
         )
         for tier in selected
     ]
@@ -535,6 +684,14 @@ def main() -> None:
             "archiveFormat": "AppleArchive",
             "compression": "lzfse",
         },
+        "activationCalibration": (
+            {
+                "corpusFile": corpus[0].name,
+                "sha256": sha256(corpus[0]),
+                "maximumSamplesPerComponent": 32,
+            }
+            if selected_uses_w8a8 and corpus is not None else None
+        ),
         "packs": packs,
     }
     (output_root / "manifest.json").write_text(

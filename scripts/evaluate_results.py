@@ -166,6 +166,7 @@ def score_sample(sample: dict[str, Any]) -> dict[str, Any]:
         "edits": edits,
         "groundTruthCharacters": ground_truth_characters,
         "timingsMilliseconds": sample.get("timingsMilliseconds", {}),
+        "measurements": sample.get("measurements", []),
     }
 
 
@@ -211,9 +212,15 @@ def aggregate(results: Iterable[dict[str, Any]]) -> dict[str, Any]:
 
     timings: dict[str, list[float]] = defaultdict(list)
     for item in items:
-        for key, value in item["timingsMilliseconds"].items():
-            if isinstance(value, (int, float)):
-                timings[key].append(float(value))
+        measurements = item["measurements"]
+        raw_timings = (
+            [measurement.get("timingsMilliseconds", {}) for measurement in measurements]
+            if measurements else [item["timingsMilliseconds"]]
+        )
+        for measurement in raw_timings:
+            for key, value in measurement.items():
+                if isinstance(value, (int, float)):
+                    timings[key].append(float(value))
     metrics["timingsMilliseconds"] = {
         key: {
             "p50": float(np.percentile(values, 50)),
@@ -276,8 +283,8 @@ def bootstrap_delta(
 
 
 def score_report(report: dict[str, Any]) -> tuple[dict[str, Any], list[dict[str, Any]]]:
-    if report.get("schemaVersion") != 1:
-        raise ValueError("report schemaVersion must be 1")
+    if report.get("schemaVersion") not in {1, 2}:
+        raise ValueError("report schemaVersion must be 1 or 2")
     samples = report.get("samples")
     if not isinstance(samples, list) or not samples:
         raise ValueError("report.samples must be a non-empty array")
