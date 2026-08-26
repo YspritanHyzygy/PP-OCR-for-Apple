@@ -4,9 +4,12 @@
 from __future__ import annotations
 
 import argparse
+import json
 import plistlib
 import re
+import shutil
 import subprocess
+import tempfile
 from pathlib import Path
 
 
@@ -51,6 +54,89 @@ def build_xctestruns(products: Path) -> list[Path]:
     )
 
 
+def stage_corpus(source: Path, destination: Path) -> Path:
+    document = json.loads(source.read_text(encoding="utf-8"))
+    if document.get("schemaVersion") != 1 or not isinstance(document.get("samples"), list):
+        raise SystemExit(f"{source}: corpus must use schemaVersion 1")
+    images = destination / "images"
+    images.mkdir(parents=True, exist_ok=True)
+    for index, sample in enumerate(document["samples"]):
+        image = Path(sample["imagePath"])
+        if not image.is_absolute():
+            image = source.parent / image
+        suffix = image.suffix.lower() or ".img"
+        name = f"{index:05d}{suffix}"
+        shutil.copy2(image, images / name)
+        sample["imagePath"] = f"images/{name}"
+    staged = destination / "corpus.json"
+    staged.write_text(
+        json.dumps(document, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+    )
+    return staged
+
+
+def stage_physical_assets(
+    products: Path,
+    model_directory: Path,
+    corpus: Path | None,
+    signing_identity: str,
+) -> dict[str, str]:
+    test_bundles = list(
+        products.glob("Debug-iphoneos/Verto.app/PlugIns/VertoTests.xctest")
+    )
+    if len(test_bundles) != 1:
+        raise SystemExit(f"{products}: expected one physical VertoTests.xctest")
+    test_bundle = test_bundles[0]
+    host_app = test_bundle.parents[1]
+    assets = test_bundle / "BenchmarkAssets"
+    if assets.exists():
+        shutil.rmtree(assets)
+    assets.mkdir()
+    shutil.copytree(model_directory, assets / "model")
+    environment = {"VERTO_OCR_BUNDLED_MODEL_PATH": "BenchmarkAssets/model"}
+    if corpus is not None:
+        staged = stage_corpus(corpus, assets / "corpus")
+        environment["VERTO_OCR_BUNDLED_CORPUS_PATH"] = str(
+            staged.relative_to(test_bundle)
+        )
+        environment["VERTO_OCR_REPORT_ATTACHMENT_NAME"] = "verto-ocr-report"
+
+    preserve = "--preserve-metadata=identifier,entitlements,requirements,flags,runtime"
+    run(["codesign", "--force", "--sign", signing_identity, preserve, str(test_bundle)], products)
+    run(["codesign", "--force", "--sign", signing_identity, preserve, str(host_app)], products)
+    return environment
+
+
+def exported_attachment(manifest: list[dict], name: str) -> str:
+    matches = [
+        attachment["exportedFileName"]
+        for test in manifest
+        for attachment in test.get("attachments", [])
+        if attachment.get("suggestedHumanReadableName", "").startswith(f"{name}_")
+    ]
+    if len(matches) != 1:
+        raise SystemExit(f"expected one {name} xcresult attachment, found {len(matches)}")
+    return matches[0]
+
+
+def extract_report_attachment(result_bundle: Path, name: str, output: Path) -> None:
+    with tempfile.TemporaryDirectory(prefix="verto-ocr-attachments-") as temporary:
+        directory = Path(temporary)
+        run(
+            [
+                "xcrun", "xcresulttool", "export", "attachments",
+                "--path", str(result_bundle),
+                "--output-path", str(directory),
+                "--filter", f"{name}*",
+            ],
+            Path.cwd(),
+        )
+        manifest = json.loads((directory / "manifest.json").read_text(encoding="utf-8"))
+        source = directory / exported_attachment(manifest, name)
+        output.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(source, output)
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--verto", required=True, type=Path, help="Verto checkout")
@@ -81,6 +167,10 @@ def main() -> None:
         "--development-team",
         help="Xcode development team for physical-device test signing",
     )
+    parser.add_argument(
+        "--signing-identity",
+        help="codesign identity used after embedding physical-device benchmark assets",
+    )
     parser.add_argument("--energy-source")
     parser.add_argument("--energy-joules", type=float)
     parser.add_argument("--energy-artifact", type=Path)
@@ -109,6 +199,8 @@ def main() -> None:
         raise SystemExit("--evidence-class must match the xcodebuild destination")
     if args.evidence_class != "simulator" and not args.development_team:
         raise SystemExit("physical-device builds require --development-team")
+    if args.evidence_class != "simulator" and not args.signing_identity:
+        raise SystemExit("physical-device benchmark assets require --signing-identity")
     if args.energy_joules is not None and not args.energy_source:
         raise SystemExit("--energy-joules requires --energy-source")
 
@@ -139,7 +231,6 @@ def main() -> None:
     if len(candidates) != 1:
         raise SystemExit(f"{products}: expected one xctestrun, found {len(candidates)}")
     environment = {
-        "VERTO_OCR_MODEL_DIR": str(args.model_dir.resolve()),
         "VERTO_OCR_MODEL_TIER": args.tier,
         "VERTO_OCR_CANDIDATE": args.candidate,
         "VERTO_OCR_CANDIDATE_KIND": args.candidate_kind,
@@ -150,6 +241,15 @@ def main() -> None:
         "VERTO_OCR_COMPUTE_UNITS": args.compute_units,
         "VERTO_OCR_EVIDENCE_CLASS": args.evidence_class,
     }
+    if args.evidence_class == "simulator":
+        environment["VERTO_OCR_MODEL_DIR"] = str(args.model_dir.resolve())
+    else:
+        environment.update(stage_physical_assets(
+            products,
+            args.model_dir.resolve(),
+            args.corpus.resolve() if args.corpus else None,
+            args.signing_identity,
+        ))
     if args.parent_candidate:
         environment["VERTO_OCR_PARENT_CANDIDATE"] = args.parent_candidate
     if args.hardware_group:
@@ -168,8 +268,9 @@ def main() -> None:
         environment["VERTO_OCR_BOX_SCORE_THRESHOLD"] = str(args.box_score_threshold)
     test_identifier = "VertoTests/PaddleOCRProbeTests/testProbePaddleRecognitionPipeline"
     if args.corpus and args.report:
-        environment["VERTO_OCR_CORPUS_JSON"] = str(args.corpus.resolve())
-        environment["VERTO_OCR_REPORT_PATH"] = str(args.report.resolve())
+        if args.evidence_class == "simulator":
+            environment["VERTO_OCR_CORPUS_JSON"] = str(args.corpus.resolve())
+            environment["VERTO_OCR_REPORT_PATH"] = str(args.report.resolve())
         test_identifier = "VertoTests/PaddleOCRProbeTests/testBenchmarkExternalCorpus"
     inject_environment(candidates[0], configured, environment)
 
@@ -187,6 +288,10 @@ def main() -> None:
         ],
         verto,
     )
+    if args.evidence_class != "simulator" and args.report:
+        extract_report_attachment(
+            args.result_bundle.resolve(), "verto-ocr-report", args.report.resolve()
+        )
 
 
 if __name__ == "__main__":
