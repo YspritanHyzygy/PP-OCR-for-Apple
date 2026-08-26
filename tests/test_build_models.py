@@ -25,10 +25,25 @@ class W8A8BuildTests(unittest.TestCase):
             report["deviceMatrix"][2]["evidenceStatus"],
             "localPhysicalSmokeOnly",
         )
+        self.assertEqual(
+            report["deviceMatrix"][0]["evidenceStatus"],
+            "visionOnlyForProduction",
+        )
         self.assertEqual(report["smokeEvidence"]["energy"], "notMeasured")
         validate_ane_compatibility_status(report, require_ready=False)
         with self.assertRaises(AssertionError):
             validate_ane_compatibility_status(report, require_ready=True)
+
+    def test_vision_only_a12_does_not_block_ready_production_groups(self):
+        report = json.loads(
+            Path("benchmarks/ane-compatibility-v2.json").read_text(encoding="utf-8")
+        )
+        report["status"] = "measured"
+        report["deviceMatrix"][1]["evidenceStatus"] = "pass"
+        report["deviceMatrix"][2]["evidenceStatus"] = "pass"
+        report["releaseBlocked"] = False
+
+        validate_ane_compatibility_status(report, require_ready=True)
 
     def test_candidate_recipe_selects_w8a8_only_for_small(self):
         recipe = load_recipe(Path("recipes/candidates/small-rec320-w8a8.json"))

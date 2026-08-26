@@ -236,9 +236,10 @@ def validate_ane_compatibility_status(report: dict[str, Any], require_ready: boo
     ]
     assert all(
         item["evidenceStatus"]
-        in {"notRecorded", "localPhysicalSmokeOnly", "pass", "fail"}
+        in {"notRecorded", "localPhysicalSmokeOnly", "visionOnlyForProduction", "pass", "fail"}
         for item in matrix
     )
+    assert matrix[0]["evidenceStatus"] == "visionOnlyForProduction"
     assert report["candidates"] == ["B1", "small-rec320", "small-rec320-w8a8"]
     assert set(report["candidateStatus"]) == set(report["candidates"])
     if any(item["evidenceStatus"] == "localPhysicalSmokeOnly" for item in matrix):
@@ -249,7 +250,10 @@ def validate_ane_compatibility_status(report: dict[str, Any], require_ready: boo
         assert smoke["measurementRunsPerPair"] == 30
         assert smoke["energy"] == "notMeasured"
         assert smoke["qualityGate"] == "notEvaluatedByThisSmoke"
-    if any(item["evidenceStatus"] != "pass" for item in matrix):
+    production_matrix = [
+        item for item in matrix if item["evidenceStatus"] != "visionOnlyForProduction"
+    ]
+    if any(item["evidenceStatus"] != "pass" for item in production_matrix):
         assert report["productionComputeUnits"] == "all"
         assert report["releaseBlocked"] is True
         decision = report["currentDecision"]
@@ -259,7 +263,7 @@ def validate_ane_compatibility_status(report: dict[str, Any], require_ready: boo
         assert decision["reason"]
     if require_ready:
         assert report["status"] == "measured"
-        assert all(item["evidenceStatus"] == "pass" for item in matrix)
+        assert all(item["evidenceStatus"] == "pass" for item in production_matrix)
         assert report["releaseBlocked"] is False
 
 

@@ -8,7 +8,7 @@
     {
       "hardwareGroup": "A12-A13",
       "representative": "iPhone XR",
-      "evidenceStatus": "localPhysicalSmokeOnly"
+      "evidenceStatus": "visionOnlyForProduction"
     },
     {
       "hardwareGroup": "A14-A16",
@@ -27,15 +27,15 @@
     "small-rec320-w8a8"
   ],
   "candidateStatus": {
-    "B1": "threeHardwareGroupPhysicalSmokeOnly",
-    "small-rec320": "threeHardwareGroupPhysicalSmokeOnly",
+    "B1": "productionGroupsPhysicalSmokePlusA12ResearchSmoke",
+    "small-rec320": "productionGroupsPhysicalSmokePlusA12ResearchSmoke",
     "small-rec320-w8a8": "builderAndRecognizerSmokeOnly"
   },
   "currentDecision": {
     "userFacingNpuSwitch": false,
     "chipModelAllowlist": false,
     "hardwareSpecificPackages": false,
-    "reason": "Thermally valid iPhone 12 and iPhone 16 Pro pairs found no 15% benefit from cpuAndNeuralEngine, while Core ML inference stayed below the 40% end-to-end focus gate. The iPhone XR runs reached serious thermal state and remain smoke-only rather than production evidence."
+    "reason": "Verto production routes A12-A13 devices to Vision without downloading PP-OCR. Thermally valid iPhone 12 and iPhone 16 Pro pairs found no 15% benefit from cpuAndNeuralEngine, while Core ML inference stayed below the 40% end-to-end focus gate. The iPhone XR runs remain preserved as optional research smoke and no longer block v2 production evidence."
   },
   "smokeEvidence": {
     "scope": "performance smoke only; one reproducible generated French sample",
