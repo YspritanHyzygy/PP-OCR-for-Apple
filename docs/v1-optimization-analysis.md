@@ -1,10 +1,10 @@
-# PP-OCR-for-Apple v1 optimization analysis
+# Verto-Model-Packs v1 optimization analysis
 
 This document records the observed v1 model structure, interface mismatches, and evidence-backed optimization opportunities. It is an analysis of the immutable `v1` release, not a roadmap or a release claim.
 
 ## Scope and evidence
 
-The inspected artifacts are the three archives published in the [`v1` release](https://github.com/YspritanHyzygy/PP-OCR-for-Apple/releases/tag/v1). File sizes and hashes come from [`manifests/v1.json`](../manifests/v1.json). Model structure comes from the six released Core ML packages. Upstream scores come from PaddlePaddle's [PP-OCRv6 documentation](https://github.com/PaddlePaddle/PaddleOCR/blob/main/docs/version3.x/algorithm/PP-OCRv6/PP-OCRv6.en.md); PaddlePaddle describes those scores as results on internal multi-scenario benchmarks, not measurements made by this project.
+The inspected artifacts are the three archives published in the [`v1` release](https://github.com/YspritanHyzygy/Verto-Model-Packs/releases/tag/v1). File sizes and hashes come from [`manifests/v1.json`](../manifests/v1.json). Model structure comes from the six released Core ML packages. Upstream scores come from PaddlePaddle's [PP-OCRv6 documentation](https://github.com/PaddlePaddle/PaddleOCR/blob/main/docs/version3.x/algorithm/PP-OCRv6/PP-OCRv6.en.md); PaddlePaddle describes those scores as results on internal multi-scenario benchmarks, not measurements made by this project.
 
 ## Released tiers
 

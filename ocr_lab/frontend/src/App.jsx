@@ -394,7 +394,7 @@ export function App() {
           <span className="connection-label">{health.status === "connected" ? "已连接" : "连接中"}</span>
         </div>
         <div className="top-actions">
-          <button className="text-button" onClick={() => navigator.clipboard.writeText(health.modelRoot || "PP-OCR-for-Apple").then(() => notify("项目路径已复制"))}>
+          <button className="text-button" onClick={() => navigator.clipboard.writeText(health.modelRoot || "Verto-Model-Packs").then(() => notify("项目路径已复制"))}>
             <FolderOpen size={17} /> 复制项目路径
           </button>
           <a className={`text-button ${result ? "" : "disabled"}`} href={result ? jsonDataURL(result) : undefined} download={result ? `${result.image_name.replace(/\.[^.]+$/, "")}-ocr-lab.json` : undefined}>

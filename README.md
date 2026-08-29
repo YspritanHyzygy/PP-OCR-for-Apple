@@ -6,7 +6,7 @@ This project is not affiliated with or endorsed by PaddlePaddle or Apple. The mo
 
 ## Release packages
 
-The [latest release](https://github.com/YspritanHyzygy/PP-OCR-for-Apple/releases/latest) publishes three tiers:
+The [latest release](https://github.com/YspritanHyzygy/Verto-Model-Packs/releases/latest) publishes three tiers:
 
 - `pp-ocr-v6-coreml-tiny-v<version>.aar`
 - `pp-ocr-v6-coreml-small-v<version>.aar`
