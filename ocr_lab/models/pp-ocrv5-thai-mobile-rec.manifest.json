@@ -1,0 +1,38 @@
+{
+  "$schema": "./model-manifest.schema.json",
+  "id": "pp-ocrv5-thai-mobile-rec",
+  "label": "PP-OCRv5 Thai Mobile Recognizer",
+  "kind": "recognizer",
+  "version": "thai-v5-1d4adbbafb10",
+  "source": "https://huggingface.co/PaddlePaddle/th_PP-OCRv5_mobile_rec_onnx/tree/1d4adbbafb1034a2fd6618498575b81ea7b69f69",
+  "license": "Apache-2.0",
+  "artifact": "pp-ocrv5-thai-mobile-rec.onnx",
+  "size_bytes": 7891015,
+  "sha256": "27618be66018f8598ac0a526a593f9f1cebf794e7eded93428e8fb016e537f5f",
+  "output_name": "fetch_name_0",
+  "output_contract": "ctc-probabilities-v1",
+  "characters_file": "pp-ocrv5-thai-mobile-rec-charset.txt",
+  "characters_sha256": "57f5406f94bb6688fb7077f7be65f08bbd71cecf48c01ea26c522cb5c4836b7a",
+  "characters_count": 524,
+  "class_count": 526,
+  "input": {
+    "name": "x",
+    "shape": [
+      1,
+      3,
+      48,
+      640
+    ],
+    "color_order": "BGR",
+    "mean": [
+      0.5,
+      0.5,
+      0.5
+    ],
+    "std": [
+      0.5,
+      0.5,
+      0.5
+    ]
+  }
+}

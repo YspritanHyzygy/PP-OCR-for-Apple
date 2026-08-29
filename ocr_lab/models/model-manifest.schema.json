@@ -1,0 +1,67 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://verto.local/ocr-lab/model-manifest.schema.json",
+  "title": "Verto OCR Lab model manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "label", "kind", "version", "source", "license", "artifact", "size_bytes", "sha256", "output_contract", "input"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "id": { "type": "string", "minLength": 1 },
+    "label": { "type": "string", "minLength": 1 },
+    "kind": { "enum": ["detector", "recognizer"] },
+    "version": { "type": "string", "minLength": 1 },
+    "source": { "type": "string", "minLength": 1 },
+    "license": { "type": "string", "minLength": 1 },
+    "artifact": { "type": "string", "pattern": "\\.onnx$" },
+    "size_bytes": { "type": "integer", "minimum": 1 },
+    "sha256": { "type": "string", "pattern": "^[0-9a-fA-F]{64}$" },
+    "output_contract": { "enum": ["db-probability-map-v1", "ctc-probabilities-v1"] },
+    "output_name": { "type": ["string", "null"] },
+    "probability_threshold": { "type": "number", "minimum": 0, "maximum": 1 },
+    "box_score_threshold": { "type": "number", "minimum": 0, "maximum": 1 },
+    "unclip_ratio": { "type": "number", "exclusiveMinimum": 0 },
+    "maximum_candidates": { "type": "integer", "minimum": 1 },
+    "characters_file": { "type": "string", "pattern": "charset\\.txt$" },
+    "characters_sha256": { "type": "string", "pattern": "^[0-9a-fA-F]{64}$" },
+    "characters_count": { "type": "integer", "minimum": 1 },
+    "class_count": { "type": "integer", "minimum": 3 },
+    "input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "shape", "color_order", "mean", "std"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "shape": {
+          "type": "array",
+          "prefixItems": [
+            { "const": 1 }, { "const": 3 },
+            { "type": "integer", "minimum": 32 },
+            { "type": "integer", "minimum": 32 }
+          ],
+          "minItems": 4,
+          "maxItems": 4
+        },
+        "color_order": { "enum": ["RGB", "BGR"] },
+        "mean": { "type": "array", "items": { "type": "number" }, "minItems": 3, "maxItems": 3 },
+        "std": { "type": "array", "items": { "type": "number", "exclusiveMinimum": 0 }, "minItems": 3, "maxItems": 3 }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "kind": { "const": "detector" } } },
+      "then": {
+        "required": ["probability_threshold", "box_score_threshold", "unclip_ratio", "maximum_candidates"],
+        "properties": { "output_contract": { "const": "db-probability-map-v1" } }
+      }
+    },
+    {
+      "if": { "properties": { "kind": { "const": "recognizer" } } },
+      "then": {
+        "required": ["characters_file", "characters_sha256", "characters_count", "class_count"],
+        "properties": { "output_contract": { "const": "ctc-probabilities-v1" } }
+      }
+    }
+  ]
+}

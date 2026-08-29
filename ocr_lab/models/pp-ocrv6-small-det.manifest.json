@@ -1,0 +1,38 @@
+{
+  "$schema": "./model-manifest.schema.json",
+  "id": "pp-ocrv6-small-det",
+  "label": "PP-OCRv6 Small Detector",
+  "kind": "detector",
+  "version": "small-28fe5895c24f",
+  "source": "https://huggingface.co/PaddlePaddle/PP-OCRv6_small_det_onnx/tree/28fe5895c24fd108c19eb3e8479f4ab385fbfc62",
+  "license": "Apache-2.0",
+  "artifact": "pp-ocrv6-small-det.onnx",
+  "size_bytes": 9880512,
+  "sha256": "d73e0058b7a8086bbd57f3d10b8bcd4ff95363f67e06e2762b5e814fe9c9410e",
+  "output_contract": "db-probability-map-v1",
+  "output_name": "fetch_name_0",
+  "probability_threshold": 0.2,
+  "box_score_threshold": 0.45,
+  "unclip_ratio": 1.4,
+  "maximum_candidates": 3000,
+  "input": {
+    "name": "x",
+    "shape": [
+      1,
+      3,
+      960,
+      960
+    ],
+    "color_order": "BGR",
+    "mean": [
+      0.485,
+      0.456,
+      0.406
+    ],
+    "std": [
+      0.229,
+      0.224,
+      0.225
+    ]
+  }
+}

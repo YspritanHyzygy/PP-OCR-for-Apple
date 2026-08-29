@@ -1,0 +1,38 @@
+{
+  "$schema": "./model-manifest.schema.json",
+  "id": "pp-ocrv6-small-rec",
+  "label": "PP-OCRv6 Small Recognizer",
+  "kind": "recognizer",
+  "version": "small-b8f84f0b80c5",
+  "source": "https://huggingface.co/PaddlePaddle/PP-OCRv6_small_rec_onnx/tree/b8f84f0b80c529de40b4fbb3544b84fa7233a513",
+  "license": "Apache-2.0",
+  "artifact": "pp-ocrv6-small-rec.onnx",
+  "size_bytes": 21159378,
+  "sha256": "5435fd747c9e0efe15a96d0b378d5bd157e9492ed8fd80edf08f30d02fa24634",
+  "output_name": "fetch_name_0",
+  "output_contract": "ctc-probabilities-v1",
+  "characters_file": "pp-ocrv6-small-rec-charset.txt",
+  "characters_sha256": "b5f2bfe2bdd9448429e3e82b51c789775d9b42f2403d082b00662eb77e401c5d",
+  "characters_count": 18708,
+  "class_count": 18710,
+  "input": {
+    "name": "x",
+    "shape": [
+      1,
+      3,
+      48,
+      640
+    ],
+    "color_order": "BGR",
+    "mean": [
+      0.5,
+      0.5,
+      0.5
+    ],
+    "std": [
+      0.5,
+      0.5,
+      0.5
+    ]
+  }
+}

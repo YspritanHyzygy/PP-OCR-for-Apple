@@ -1,0 +1,55 @@
+{
+  "image_name": "sample-menu.png",
+  "width": 1448,
+  "height": 1086,
+  "detector": "sample-fixture",
+  "classifier": "sample-fixture",
+  "recognizer": "sample-fixture",
+  "regions": [
+    {
+      "id": 1,
+      "quad": [{"x": 134, "y": 178}, {"x": 479, "y": 119}, {"x": 524, "y": 419}, {"x": 177, "y": 477}],
+      "confidence": 0.989,
+      "text": "本日おすすめ\n新鮮なお刺身の盛り合わせ",
+      "layout": {"writing_mode": "horizontal", "reading_direction": "left-to-right", "script_family": "kana", "confidence": 0.976}
+    },
+    {
+      "id": 2,
+      "quad": [{"x": 621, "y": 144}, {"x": 1030, "y": 144}, {"x": 1030, "y": 449}, {"x": 621, "y": 449}],
+      "confidence": 0.993,
+      "text": "Today's Special\nFresh Sashimi Platter\nAssorted 3 Kinds\n¥168",
+      "layout": {"writing_mode": "horizontal", "reading_direction": "left-to-right", "script_family": "latin", "confidence": 0.991}
+    },
+    {
+      "id": 3,
+      "quad": [{"x": 603, "y": 491}, {"x": 986, "y": 491}, {"x": 986, "y": 713}, {"x": 603, "y": 713}],
+      "confidence": 0.982,
+      "text": "오늘의 추천\n신선한 사시미 모듬",
+      "layout": {"writing_mode": "horizontal", "reading_direction": "left-to-right", "script_family": "hangul", "confidence": 0.986}
+    },
+    {
+      "id": 4,
+      "quad": [{"x": 105, "y": 663}, {"x": 544, "y": 663}, {"x": 544, "y": 948}, {"x": 105, "y": 948}],
+      "confidence": 0.963,
+      "text": "แนะนำประจำวันที่\nชุดปลาดิบรวมสดใหม่",
+      "layout": {"writing_mode": "horizontal", "reading_direction": "left-to-right", "script_family": "other", "confidence": 0.944}
+    },
+    {
+      "id": 5,
+      "quad": [{"x": 607, "y": 752}, {"x": 985, "y": 752}, {"x": 985, "y": 956}, {"x": 607, "y": 956}],
+      "confidence": 0.992,
+      "text": "营业时间\n11:00–22:00",
+      "layout": {"writing_mode": "horizontal", "reading_direction": "left-to-right", "script_family": "han", "confidence": 0.987}
+    },
+    {
+      "id": 6,
+      "quad": [{"x": 1115, "y": 163}, {"x": 1380, "y": 163}, {"x": 1380, "y": 939}, {"x": 1115, "y": 939}],
+      "confidence": 0.982,
+      "text": "本日のおすすめ\n新鮮なお刺身の盛り合わせ",
+      "layout": {"writing_mode": "vertical", "reading_direction": "top-to-bottom", "script_family": "kana", "confidence": 0.982}
+    }
+  ],
+  "timings_ms": {"preprocessing": 42, "detection": 18, "layout": 7, "recognition": 86, "total": 153},
+  "model_versions": {"detector": "fixture-1", "classifier": "fixture-1", "recognizer": "fixture-1"},
+  "warnings": ["示例图片使用固定夹具结果；上传图片会运行当前选择的实际本地 detector。"]
+}

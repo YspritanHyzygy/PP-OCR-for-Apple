@@ -1,6 +1,6 @@
 {
-  "schemaVersion": 1,
-  "modelFamily": "PP-OCRv6",
+  "schemaVersion": 2,
+  "modelFamily": "PP-OCR",
   "license": "Apache-2.0",
   "tiers": {
     "tiny": {
@@ -32,6 +32,20 @@
         "repository": "PaddlePaddle/PP-OCRv6_medium_rec_onnx",
         "revision": "50c7eacafc52fa7bcf4194e8cd08e46f8558504b"
       }
+    }
+  },
+  "supplementalRecognizers": {
+    "multilingual-v5": {
+      "id": "pp-ocrv5-mobile-rec",
+      "label": "PP-OCRv5 Mobile Recognizer (中 / 英 / 日)",
+      "repository": "PaddlePaddle/PP-OCRv5_mobile_rec_onnx",
+      "revision": "ed152b8b495f84de93cda5709d768548a9127622"
+    },
+    "thai-v5": {
+      "id": "pp-ocrv5-thai-mobile-rec",
+      "label": "PP-OCRv5 Thai Mobile Recognizer",
+      "repository": "PaddlePaddle/th_PP-OCRv5_mobile_rec_onnx",
+      "revision": "1d4adbbafb1034a2fd6618498575b81ea7b69f69"
     }
   }
 }

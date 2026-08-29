@@ -1,0 +1,25 @@
+{
+  "$schema": "./model-manifest.schema.json",
+  "id": "verto-text-detector",
+  "label": "VertoTextDetector",
+  "kind": "detector",
+  "version": "0.1.0",
+  "source": "https://replace.example/model-card",
+  "license": "replace-with-SPDX-or-model-license",
+  "artifact": "verto-text-detector.onnx",
+  "size_bytes": 1234567,
+  "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "output_contract": "db-probability-map-v1",
+  "output_name": null,
+  "probability_threshold": 0.3,
+  "box_score_threshold": 0.5,
+  "unclip_ratio": 1.5,
+  "maximum_candidates": 3000,
+  "input": {
+    "name": "x",
+    "shape": [1, 3, 960, 960],
+    "color_order": "RGB",
+    "mean": [0.485, 0.456, 0.406],
+    "std": [0.229, 0.224, 0.225]
+  }
+}
