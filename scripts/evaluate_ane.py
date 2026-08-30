@@ -17,7 +17,9 @@ PHYSICAL_EVIDENCE = {"localPhysical", "remotePhysical"}
 COMPARABLE_THERMAL_STATES = {"nominal", "fair"}
 COMPUTE_UNITS = {"all", "cpuAndNeuralEngine", "cpuAndGPU", "cpuOnly"}
 CANDIDATE_KINDS = {"reference", "shape", "w8a8", "boundary", "unspecified"}
-REQUIRED_HARDWARE_GROUPS = {"A12-A13", "A14-A16", "A17Pro-A19"}
+# Verto routes A12-A13 production devices to Vision, so PP-OCR release evidence
+# starts at A14. A12 reports remain accepted and visible as optional research.
+REQUIRED_HARDWARE_GROUPS = {"A14-A16", "A17Pro-A19"}
 ANE_SHARE_GATE = 0.90
 SIGNIFICANT_OPERATION_SHARE = 0.05
 BENEFIT_GATE = 0.15
@@ -414,9 +416,7 @@ def w8a8_decision(comparisons: list[dict[str, Any]]) -> dict[str, Any]:
         and item["thermalEvidenceValid"]
     }
     modern = [item for item in values if item["hardwareGroup"] == "A17Pro-A19"]
-    legacy = [
-        item for item in values if item["hardwareGroup"] in {"A12-A13", "A14-A16"}
-    ]
+    legacy = [item for item in values if item["hardwareGroup"] == "A14-A16"]
     quality_pass = bool(values) and all(item["qualityDecision"] == "pass" for item in values)
     modern_pass = bool(modern) and all(
         item["evidenceClass"] in PHYSICAL_EVIDENCE
@@ -425,7 +425,7 @@ def w8a8_decision(comparisons: list[dict[str, Any]]) -> dict[str, Any]:
         and not item["regressionsOverTenPercent"]
         for item in modern
     )
-    legacy_pass = {item["hardwareGroup"] for item in legacy} == {"A12-A13", "A14-A16"} and all(
+    legacy_pass = {item["hardwareGroup"] for item in legacy} == {"A14-A16"} and all(
         item["evidenceClass"] in PHYSICAL_EVIDENCE
         and item["thermalEvidenceValid"]
         and not item["regressionsOverTenPercent"]
@@ -456,16 +456,19 @@ def assess(
             "performance": performance_summary(report),
         })
     comparisons = compare_compute_units(reports)
+    production_comparisons = [
+        item for item in comparisons if item["hardwareGroup"] in REQUIRED_HARDWARE_GROUPS
+    ]
     candidate_comparisons = compare_candidates(reports, quality_decisions)
     covered = {
-        item["hardwareGroup"] for item in comparisons
+        item["hardwareGroup"] for item in production_comparisons
         if item["evidenceClass"] in PHYSICAL_EVIDENCE
         and item["thermalEvidenceValid"]
     }
     eligible = (
         REQUIRED_HARDWARE_GROUPS <= covered
-        and bool(comparisons)
-        and all(item["eligibleForProduction"] for item in comparisons)
+        and bool(production_comparisons)
+        and all(item["eligibleForProduction"] for item in production_comparisons)
     )
     return {
         "schemaVersion": 1,
@@ -486,8 +489,8 @@ def assess(
             "decision": "cpuAndNeuralEngineEligible" if eligible else "keepAll",
             "coveredHardwareGroups": sorted(covered),
             "missingHardwareGroups": sorted(REQUIRED_HARDWARE_GROUPS - covered),
-            "allSuppliedComparisonsPass": bool(comparisons) and all(
-                item["eligibleForProduction"] for item in comparisons
+            "allSuppliedComparisonsPass": bool(production_comparisons) and all(
+                item["eligibleForProduction"] for item in production_comparisons
             ),
         },
     }

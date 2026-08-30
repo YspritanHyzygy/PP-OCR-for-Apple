@@ -2,7 +2,7 @@
 
 ## Current decision
 
-Verto continues to load every production OCR model with `MLComputeUnits.all`. There is no user-facing NPU switch, chip allowlist, or hardware-specific download package. Core ML can already schedule supported operations across the Neural Engine, GPU, and CPU. Thermally valid iPhone 12 and iPhone 16 Pro pairs found no qualifying benefit from `cpuAndNeuralEngine`; iPhone XR runs reached serious thermal state and remain smoke-only. Nothing in the recorded evidence supports overriding Core ML's default scheduler.
+Verto routes A12-A13 production devices to Vision and does not download PP-OCR there. On A14 and newer devices, every production OCR model continues to use `MLComputeUnits.all`. There is no user-facing NPU switch, chip allowlist, or hardware-specific download package. Core ML can already schedule supported operations across the Neural Engine, GPU, and CPU. Thermally valid iPhone 12 and iPhone 16 Pro pairs found no qualifying benefit from `cpuAndNeuralEngine`; iPhone XR runs remain optional research smoke. Nothing in the recorded evidence supports overriding Core ML's default scheduler.
 
 Every iPhone that can run Verto's minimum iOS 17 target has an Apple Neural Engine. The compatibility question is therefore not whether an NPU exists, but whether each Core ML operation is placed there and whether forcing CPU plus Neural Engine improves the complete OCR pipeline. Apple exposes compute-unit policy, not individual Neural Engine core selection.
 
@@ -19,7 +19,7 @@ Primary references:
 
 | Evidence group | Representative iPhones | Purpose |
 |---|---|---|
-| A12-A13 | iPhone XS/XR, 11, SE (2nd generation) | Oldest supported Neural Engine boundary |
+| A12-A13 | iPhone XS/XR, 11, SE (2nd generation) | Vision-only in production; optional PP-OCR research boundary |
 | A14-A16 | iPhone 12-14 families, iPhone 15, SE (3rd generation) | Modern Float16 baseline and pre-A17 INT8 boundary |
 | A17 Pro-A19 | iPhone 15 Pro and later generations | Newer INT8-capable path and local iPhone 16 Pro evidence |
 | future | Later A-series chips | Re-run the same capability-based protocol; never add a guessed model allowlist |
@@ -61,11 +61,11 @@ See [`evaluation/ane-report-schema.md`](../evaluation/ane-report-schema.md) for 
 
 `scripts/evaluate_ane.py` owns the decisions; Verto never grades itself. For each detector and recognizer under `all`, the assessor requires at least 90% of known estimated cost to prefer the Neural Engine, no cost-bearing operation with missing device usage or no Neural Engine support, and a written explanation for every non-ANE operation representing at least 5% of cost. Unweighted bookkeeping and constants remain visible in the raw counts but do not pretend to consume runtime cost.
 
-A production change to `cpuAndNeuralEngine` remains ineligible until same-device pairs cover all three physical hardware groups. Each pair must preserve identical OCR output, improve warm end-to-end p50 or measured energy by at least 15%, and keep every measured latency, memory, and energy dimension within 10% of `all`. Both runs must report the same thermal-state set, and only nominal or fair measurements may cover a production hardware group; serious or critical results stay visible as smoke evidence but cannot pass.
+A production change to `cpuAndNeuralEngine` remains ineligible until same-device pairs cover both PP-OCR production groups, A14-A16 and A17 Pro or newer. Each pair must preserve identical OCR output, improve warm end-to-end p50 or measured energy by at least 15%, and keep every measured latency, memory, and energy dimension within 10% of `all`. Both runs must report the same thermal-state set, and only nominal or fair measurements may cover a production hardware group; serious or critical results stay visible as smoke evidence but cannot pass. A12-A13 measurements may still be recorded as research, but do not enter this gate.
 
 If detector plus recognizer inference accounts for less than 40% of end-to-end time, the assessor redirects work to CPU preprocessing, DB post-processing, and CTC decoding. A hardware-specific package is outside v2 unless a later experiment shows at least 25% modern-device benefit and a stable public capability check exists.
 
-W8A8 remains an experiment, not a default package. It must first pass the existing v2 quality gates, then improve A18 Pro end-to-end latency or energy by at least 15% without regressing A12/A16 by more than 10%. Weight-only INT8, palette compression, smaller detectors, and cross-tier components already rejected by the quality funnel do not re-enter merely under an NPU label.
+W8A8 remains an experiment, not a default package. It must first pass the existing v2 quality gates, then improve A18 Pro end-to-end latency or energy by at least 15% without regressing the A14-A16 production boundary by more than 10%. Weight-only INT8, palette compression, smaller detectors, and cross-tier components already rejected by the quality funnel do not re-enter merely under an NPU label.
 
 The existing recipe builder now supports this as [`recipes/candidates/small-rec320-w8a8.json`](../recipes/candidates/small-rec320-w8a8.json). It refuses to build without a public schema-v1 calibration corpus, calibrates activation ranges before applying per-channel INT8 weights, verifies that activation and weight quantization operators are present, and rejects non-finite or over-tolerance output. A one-sample recognizer smoke proves the coremltools 9.0 compression and inference path; it is not a quality or performance result. A real candidate build uses:
 
@@ -128,6 +128,6 @@ The private 36-photo holdout stays on the local iPhone 16 Pro and is run only fo
 
 ## Remaining physical-device boundary
 
-The iPhone 12 and iPhone 16 Pro smoke pairs are thermally valid and reject a production compute-unit override. The iPhone XR completed both B1 small and `small-rec320`, but serious thermal state prevents those runs from closing the A12-A13 production evidence gate. A cooled, thermally matched A12 pair remains required for a complete hardware matrix. The iPhone 12 is an A14 device and must not be described as A16 evidence even though it covers the same compatibility group.
+The iPhone 12 and iPhone 16 Pro smoke pairs are thermally valid and reject a production compute-unit override. The iPhone XR completed both B1 small and `small-rec320`, but serious thermal state keeps those runs at research-smoke quality. Because Verto now routes A12-A13 production devices to Vision, a cooled XR pair is optional research and no longer a v2 release blocker. The iPhone 12 is an A14 device and must not be described as A16 evidence even though it covers the same compatibility group.
 
-BrowserStack remains a fallback only if a thermally valid local A12 pair cannot be completed. No cloud upload workflow is committed because v2 assets and the locked public corpus remain release-blocked, and no paid usage has been authorized. Until the cooled A12 pair, energy evidence, and full quality gates are recorded, hardware-specific packaging remains forbidden.
+BrowserStack remains optional if a thermally valid A12 research pair is still desired. No cloud upload workflow is committed because v2 assets and the locked public corpus remain release-blocked, and no paid usage has been authorized. Until the A14-A16/A17+ production evidence, energy evidence, and full quality gates are recorded, hardware-specific packaging remains forbidden.

@@ -121,9 +121,9 @@ class ANEAssessmentTests(unittest.TestCase):
         )[0]
         self.assertTrue(with_explanation["aneFriendly"])
 
-    def test_cpu_and_neural_engine_needs_all_three_physical_groups(self):
+    def test_cpu_and_neural_engine_needs_both_production_model_groups(self):
         reports = []
-        for group in ("A12-A13", "A14-A16", "A17Pro-A19"):
+        for group in ("A14-A16", "A17Pro-A19"):
             reports.append(make_report(group, "all", 100.0))
             reports.append(make_report(group, "cpuAndNeuralEngine", 80.0))
         result = assess(reports, {})
@@ -164,7 +164,7 @@ class ANEAssessmentTests(unittest.TestCase):
         self.assertFalse(comparison["eligibleForProduction"])
         self.assertEqual(
             result["productionComputeUnitsDecision"]["missingHardwareGroups"],
-            ["A12-A13", "A14-A16", "A17Pro-A19"],
+            ["A14-A16", "A17Pro-A19"],
         )
 
     def test_core_ml_below_forty_percent_redirects_optimization(self):
@@ -181,7 +181,7 @@ class ANEAssessmentTests(unittest.TestCase):
 
     def test_w8a8_requires_quality_modern_benefit_and_legacy_guards(self):
         reports = []
-        for group in ("A12-A13", "A14-A16", "A17Pro-A19"):
+        for group in ("A14-A16", "A17Pro-A19"):
             reports.append(make_report(group, "all", 100.0, candidate="small-rec320"))
             reports.append(make_report(
                 group,
