@@ -1,0 +1,35 @@
+{
+  "device": "iPhone17,1",
+  "modelSHA256": "fd5b5acc004954e178e523eb438c421495708a369bb2a4d56b5438b89f249c4e",
+  "os": "Version 27.0 (Build 24A5424a)",
+  "runOrder": ["cpuAndGPU", "all"],
+  "warmupRunsPerMode": 1,
+  "measuredRunsPerMode": 3,
+  "results": [
+    {
+      "name": "cpuAndGPU",
+      "coldLoadMilliseconds": 128.600875,
+      "predictionMilliseconds": [55.437833, 55.229667, 51.8105],
+      "medianPredictionMilliseconds": 55.229667,
+      "observedResidentHighWaterBytes": 84836352,
+      "thermalState": "nominal",
+      "outputSamples": [0.052993774, 0.034347534, 0.26221466]
+    },
+    {
+      "name": "all",
+      "coldLoadMilliseconds": 834.193041,
+      "predictionMilliseconds": [35.101292, 35.358125, 35.62425],
+      "medianPredictionMilliseconds": 35.358125,
+      "observedResidentHighWaterBytes": 53542912,
+      "thermalState": "nominal",
+      "outputSamples": [0.052734375, 0.033935547, 0.26220703]
+    }
+  ],
+  "trace": {
+    "treeSHA256": "4be29c44b478124732e3c7ec0692c61adea273867ca5dd299a13335537931b51",
+    "modelPredictionRows": 101,
+    "nestedNeuralEngineRows": 36,
+    "gpuRowsAttributedToMIGANBench": 0,
+    "executionDevice": "Apple Neural Engine"
+  }
+}

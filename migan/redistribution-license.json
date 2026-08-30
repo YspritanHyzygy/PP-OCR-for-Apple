@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "status": "unconfirmed",
+  "checkpointSHA256": "1d6087eee0aac8923ad2606be5d8caeb4824d3e4de331995e420c74e124a466a",
+  "grantor": "Picsart AI Research (PAIR)",
+  "confirmedAt": null,
+  "primaryEvidenceURL": "https://github.com/Picsart-AI-Research/MI-GAN/blob/2381ef9d322caa4f90550f4b7072a6f681efb8c2/LICENSE",
+  "supportingEvidenceURLs": [
+    "https://github.com/Picsart-AI-Research/MI-GAN/blob/2381ef9d322caa4f90550f4b7072a6f681efb8c2/README.md#prepare-environment"
+  ],
+  "evidenceFile": "migan/licenses/PAIR-MIT-WEIGHTS-EVIDENCE.md",
+  "evidenceSHA256": "587684b27d721922241d7b638af45afd2e1f9d92ae420a4af0e95de1de1ddeb8",
+  "rightsConfirmationURL": null,
+  "rightsConfirmationFile": null,
+  "rightsConfirmationSHA256": null,
+  "scopes": {
+    "checkpointRedistribution": false,
+    "convertedDerivativeRedistribution": false,
+    "commercialUse": false
+  },
+  "note": "The pinned MIT license and official README checkpoint source are preserved in the evidence file. The available primary text does not explicitly grant redistribution of the separately hosted checkpoint or converted Core ML derivatives."
+}

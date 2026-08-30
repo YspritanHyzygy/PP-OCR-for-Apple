@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "releaseTag": "migan-v1",
+  "status": "complete",
+  "modelTreeSHA256": "fd5b5acc004954e178e523eb438c421495708a369bb2a4d56b5438b89f249c4e",
+  "device": {
+    "marketingName": "iPhone 16 Pro",
+    "productType": "iPhone17,1",
+    "chip": "A18 Pro",
+    "memoryBytes": 8589934592
+  },
+  "os": "iOS 27.0 (24A5424a)",
+  "thermalState": "nominal",
+  "computeUnits": "ALL",
+  "measurementScope": "model.prediction",
+  "coldLoadIncludesCompilation": false,
+  "warmupRuns": 1,
+  "measuredRuns": 3,
+  "coldLoadMilliseconds": 834.193041,
+  "predictionMilliseconds": [35.101292, 35.358125, 35.62425],
+  "medianPredictionMilliseconds": 35.358125,
+  "observedResidentHighWaterBytes": 53542912,
+  "coreMLInstruments": {
+    "status": "model-named-ane-observed",
+    "executionDevice": "Apple Neural Engine",
+    "traceSHA256": "4be29c44b478124732e3c7ec0692c61adea273867ca5dd299a13335537931b51",
+    "modelName": "MIGAN512Places2",
+    "limitations": [
+      "The trace does not record MLComputeUnits.all.",
+      "The trace does not bind the recorded rows to the candidate model SHA-256."
+    ]
+  },
+  "notes": [
+    "Resident bytes were sampled after predictions and are not a process peak-memory measurement.",
+    "Application crop preparation, tensor fill, output conversion, blending, layout, and UI publication are outside this report."
+  ]
+}

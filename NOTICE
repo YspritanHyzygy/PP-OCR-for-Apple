@@ -13,3 +13,7 @@ by the PaddleOCR authors and published by PaddlePaddle under Apache License 2.0:
 This project is not affiliated with or endorsed by PaddlePaddle or Apple.
 PP-OCR and PaddlePaddle names belong to their respective owners. Apple and
 Core ML are trademarks of Apple Inc.
+
+The repository also contains MI-GAN conversion tooling. Its source attribution
+and the independent pretrained-checkpoint publication gate are documented in
+migan/NOTICE.

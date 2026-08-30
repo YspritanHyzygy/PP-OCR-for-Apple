@@ -38,3 +38,5 @@ Public archives are converted with [`scripts/prepare_corpus.py`](scripts/prepare
 
 - [`v2-candidates.json`](benchmarks/v2-candidates.json) — conversion and Mac-only single-variable screening; blocked candidates are not release recommendations
 - [`v2-public-screening.json`](benchmarks/v2-public-screening.json) — available public-corpus results, rejected candidates, and explicit release blockers
+- [`migan-v1.json`](benchmarks/migan-v1.json): MI-GAN iPhone 16 Pro release benchmark and model-named Neural Engine trace observation
+- [`migan-device-matrix-v1.json`](benchmarks/migan-device-matrix-v1.json): MI-GAN iPhone 16 Pro, iPhone 12, and iPhone XR correctness and latency matrix

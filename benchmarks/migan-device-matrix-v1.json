@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 1,
+  "releaseTag": "migan-v1",
+  "modelTreeSHA256": "fd5b5acc004954e178e523eb438c421495708a369bb2a4d56b5438b89f249c4e",
+  "measurementScope": "model.prediction and fixed-fixture full-output comparison",
+  "sourceArtifacts": [
+    {
+      "name": "iphone16pro-migan-benchmark-fresh.json",
+      "file": "benchmarks/evidence/iphone16pro-migan-benchmark-fresh.json",
+      "sha256": "b011808cc77045210706f1cc0ed7c2e02048aa24c5609a865ae02116ed802299"
+    },
+    {
+      "name": "iphone12-xr-migan-benchmark-raw.json",
+      "file": "benchmarks/evidence/iphone12-xr-migan-benchmark-raw.json",
+      "sha256": "af5e67906ee7155588b417a950e9bca633ddf28ff0b9406476ec51c537e69c4e",
+      "sourceSHA256": "e6cc43f95bc6cbf3ad3684957e6d7fb8f74a10bea642cf31a08b52481c03b631",
+      "normalization": "removed one trailing blank line"
+    }
+  ],
+  "devices": [
+    {
+      "device": "iPhone 16 Pro",
+      "productType": "iPhone17,1",
+      "os": "iOS 27.0 (24A5424a)",
+      "thermalState": "nominal",
+      "allMedianMilliseconds": 35.358125,
+      "cpuAndGPUMedianMilliseconds": 55.229667,
+      "inpaintRegionAllVsGPU": {
+        "meanAbsoluteError": 0.00035917753453499506,
+        "maximumAbsoluteError": 0.013477325439453125,
+        "fractionAbove0_05": 0.0
+      },
+      "anePathDecision": "fixed-fixture-pass",
+      "instrumentsEvidence": "model-named-ane-observed"
+    },
+    {
+      "device": "iPhone 12",
+      "productType": "iPhone13,2",
+      "os": "iOS 18.4 (22E5232a)",
+      "thermalState": "nominal",
+      "allMedianMilliseconds": 68.501916,
+      "cpuAndGPUMedianMilliseconds": 103.994333,
+      "inpaintRegionAllVsGPU": {
+        "meanAbsoluteError": 0.00030129521841272,
+        "maximumAbsoluteError": 0.01140594482421875,
+        "fractionAbove0_05": 0.0
+      },
+      "anePathDecision": "fixed-fixture-pass",
+      "instrumentsEvidence": "model-named-ane-observed"
+    },
+    {
+      "device": "iPhone XR",
+      "productType": "iPhone11,8",
+      "os": "iOS 18.5 (22F76)",
+      "thermalState": "fair",
+      "allMedianMilliseconds": 119.15025,
+      "cpuAndGPUMedianMilliseconds": 159.001667,
+      "inpaintRegionAllVsGPU": {
+        "meanAbsoluteError": 0.22166915284192545,
+        "maximumAbsoluteError": 0.9761962890625,
+        "fractionAbove0_05": 0.8142113095238095
+      },
+      "anePathDecision": "fixed-fixture-reject",
+      "cpuAndGPUOutputUsable": true,
+      "instrumentsEvidence": "raw-capture-unfinalized",
+      "notes": [
+        "The raw Instruments capture could not be exported after xctrace stalled during finalization.",
+        "This record makes no direct execution-device claim for the XR capture."
+      ]
+    }
+  ],
+  "provisionalCorrectnessGate": {
+    "maximumMeanAbsoluteError": 0.01,
+    "maximumFractionAbove0_05": 0.01
+  }
+}

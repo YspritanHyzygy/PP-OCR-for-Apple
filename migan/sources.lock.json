@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "modelFamily": "MI-GAN-512-Places2",
+  "upstreamCode": {
+    "repository": "https://github.com/Picsart-AI-Research/MI-GAN.git",
+    "revision": "2381ef9d322caa4f90550f4b7072a6f681efb8c2",
+    "license": "MIT",
+    "licenseURL": "https://github.com/Picsart-AI-Research/MI-GAN/blob/2381ef9d322caa4f90550f4b7072a6f681efb8c2/LICENSE"
+  },
+  "checkpoint": {
+    "fileName": "migan_512_places2.pt",
+    "downloadURL": "https://drive.usercontent.google.com/download?id=1D_YCuCgo20S2256sqpedsmENNm2WMtVY&export=download&confirm=t",
+    "landingPageURL": "https://drive.google.com/drive/folders/1xNtvN2lto0p5yFKOEEg9RioMjGrYM74w?usp=share_link",
+    "distributionEvidenceURL": "https://github.com/Picsart-AI-Research/MI-GAN/blob/2381ef9d322caa4f90550f4b7072a6f681efb8c2/README.md#prepare-environment",
+    "bytes": 29553256,
+    "sha256": "1d6087eee0aac8923ad2606be5d8caeb4824d3e4de331995e420c74e124a466a"
+  },
+  "conversion": {
+    "releaseTag": "migan-v1",
+    "archiveName": "migan-512-places2-coreml-v1.aar",
+    "modelName": "MIGAN512Places2.mlpackage",
+    "minimumDeploymentTarget": "iOS17",
+    "modelType": "MLProgram",
+    "computePrecision": "FLOAT16",
+    "computeUnits": "ALL",
+    "inputs": [
+      {
+        "name": "image",
+        "shape": [1, 3, 512, 512],
+        "dataType": "FLOAT16",
+        "range": [0, 1]
+      },
+      {
+        "name": "mask",
+        "shape": [1, 1, 512, 512],
+        "dataType": "FLOAT16",
+        "knownValue": 1,
+        "holeValue": 0
+      }
+    ],
+    "output": {
+      "name": "output",
+      "shape": [1, 3, 512, 512],
+      "dataType": "FLOAT32",
+      "range": [0, 1]
+    },
+    "parityTolerance": {
+      "maximumAbsoluteError": 0.09,
+      "meanAbsoluteError": 0.01
+    }
+  }
+}

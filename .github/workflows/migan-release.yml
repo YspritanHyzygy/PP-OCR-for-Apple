@@ -1,0 +1,72 @@
+name: Build and publish MI-GAN release
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+      - name: Install locked conversion environment
+        run: uv sync --locked --python 3.12
+      - name: Validate source and gate metadata
+        run: python3 scripts/check_migan.py
+      - name: Build the pinned MI-GAN package
+        run: uv run python scripts/build_migan.py --out dist/migan-v1
+      - name: Validate the candidate bytes
+        run: >-
+          python3 scripts/check_migan.py
+          --manifest dist/migan-v1/migan-manifest.json
+          --assets dist/migan-v1
+          --require-release-ready
+      - uses: actions/upload-artifact@v4
+        with:
+          name: migan-v1-candidate
+          path: dist/migan-v1
+          if-no-files-found: error
+
+  publish:
+    needs: build
+    runs-on: macos-latest
+    environment: migan-release
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: migan-v1-candidate
+          path: dist/migan-v1
+      - name: Recheck publication gates and candidate bytes
+        run: >-
+          python3 scripts/check_migan.py
+          --manifest dist/migan-v1/migan-manifest.json
+          --assets dist/migan-v1
+          --require-release-ready
+      - name: Publish immutable MI-GAN release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: >-
+          gh release create migan-v1
+          dist/migan-v1/migan-512-places2-coreml-v1.aar
+          dist/migan-v1/migan-manifest.json
+          dist/migan-v1/MIGAN-SHA256SUMS
+          migan/MODEL_CARD.md
+          migan/NOTICE
+          migan/redistribution-license.json
+          migan/licenses/PAIR-MIT-WEIGHTS-EVIDENCE.md
+          benchmarks/migan-v1.json
+          benchmarks/migan-device-matrix-v1.json
+          benchmarks/evidence/iphone16pro-migan-benchmark-fresh.json
+          benchmarks/evidence/iphone12-xr-migan-benchmark-raw.json
+          benchmarks/evidence/migan-coreml.trace.zip
+          --title "MI-GAN 512 Core ML package v1"
+          --latest=false
+          --target "${GITHUB_SHA}"
